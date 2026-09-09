@@ -1,0 +1,64 @@
+<div class="row g-3" id="notes-grid">
+  {% for note in notes %}
+    {% include "partials/note_card.html" %}
+  {% else %}
+    <div class="col-12 py-5 text-center">
+      <div class="py-5">
+        <div class="d-inline-flex align-items-center justify-content-center bg-body-secondary text-muted rounded-circle p-4 mb-3" style="width: 72px; height: 72px;">
+          {% if current_status == 'trash' %}
+            <i class="bi bi-trash3 fs-2"></i>
+          {% elif current_status == 'favorites' %}
+            <i class="bi bi-heart fs-2"></i>
+          {% elif current_status == 'pinned' %}
+            <i class="bi bi-pin-angle fs-2"></i>
+          {% elif current_status == 'archived' %}
+            <i class="bi bi-archive fs-2"></i>
+          {% else %}
+            <i class="bi bi-journal-plus fs-2"></i>
+          {% endif %}
+        </div>
+        
+        <h3 class="h5 fw-bold mb-1">
+          {% if current_status == 'trash' %}
+            Trash is Empty
+          {% elif current_status == 'favorites' %}
+            No Favorite Notes
+          {% elif current_status == 'pinned' %}
+            No Pinned Notes
+          {% elif current_status == 'archived' %}
+            No Archived Notes
+          {% elif query %}
+            No notes matching "{{ query }}"
+          {% else %}
+            No Notes Yet
+          {% endif %}
+        </h3>
+        
+        <p class="text-muted small mb-3">
+          {% if current_status == 'trash' %}
+            Deleted notes will appear here before being permanently removed.
+          {% elif current_status == 'favorites' %}
+            Click the heart icon on any note to add it to your favorites.
+          {% elif current_status == 'pinned' %}
+            Click the pin icon on any note to keep it pinned at the top.
+          {% elif current_status == 'archived' %}
+            Archive notes you want to keep organized without cluttering your main view.
+          {% elif query %}
+            Try adjusting your search terms or clearing your filters.
+          {% else %}
+            Get started by creating your very first note!
+          {% endif %}
+        </p>
+
+        {% if current_status != 'trash' and not query %}
+        <button class="btn btn-primary btn-sm rounded-pill px-3"
+                hx-get="/notes/create-modal"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+          <i class="bi bi-plus-lg me-1"></i> Create Note
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>

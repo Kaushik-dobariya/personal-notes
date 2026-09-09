@@ -1,0 +1,37 @@
+<div id="note-tags-container-{{ note.id }}" class="mb-3">
+  <div class="d-flex flex-wrap align-items-center gap-1">
+    {% for tag in note.tags %}
+    <span class="tag-badge">
+      #{{ tag.name }}
+      <span class="tag-delete-btn"
+            title="Remove tag"
+            hx-delete="/notes/{{ note.id }}/tags/{{ tag.id }}"
+            hx-target="#note-tags-container-{{ note.id }}"
+            hx-swap="outerHTML">
+        <i class="bi bi-x"></i>
+      </span>
+    </span>
+    {% endfor %}
+
+    <!-- Quick Add Tag Inline Input -->
+    {% if not note.is_deleted %}
+    <form class="d-inline-flex"
+          hx-post="/notes/{{ note.id }}/tags"
+          hx-target="#note-tags-container-{{ note.id }}"
+          hx-swap="outerHTML"
+          hx-on::after-request="this.reset()">
+      <div class="input-group input-group-sm" style="width: 130px;">
+        <input type="text" 
+               name="name" 
+               class="form-control form-control-sm py-0 px-2 rounded-start-pill" 
+               style="font-size: 0.725rem;" 
+               placeholder="+ Add tag..." 
+               required>
+        <button class="btn btn-outline-secondary py-0 px-2 rounded-end-pill" type="submit" style="font-size: 0.725rem;">
+          <i class="bi bi-plus"></i>
+        </button>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,41 @@
+<div class="modal fade show d-block" id="tagModal" tabindex="-1" aria-modal="true" role="dialog" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow rounded-3">
+      
+      <div class="modal-header border-bottom py-2" style="border-color: var(--card-border) !important;">
+        <h5 class="modal-title fw-bold fs-6">
+          <i class="bi bi-tag-fill me-1 text-primary"></i> 
+          {% if tag %}Rename Tag{% else %}New Tag{% endif %}
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" onclick="document.getElementById('modal-container').innerHTML = ''"></button>
+      </div>
+
+      <form {% if tag %}hx-put="/tags/{{ tag.id }}"{% else %}hx-post="/tags"{% endif %}
+            hx-target="#sidebar-tags-list"
+            hx-swap="innerHTML">
+        <div class="modal-body py-3">
+          <div class="mb-2">
+            <label for="tag_name_input" class="form-label small fw-semibold">Tag Name</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">#</span>
+              <input type="text" 
+                     class="form-control form-control-sm" 
+                     id="tag_name_input" 
+                     name="name" 
+                     value="{{ tag.name if tag else '' }}" 
+                     placeholder="e.g. project, urgent" 
+                     required 
+                     autofocus>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top py-2" style="border-color: var(--card-border) !important;">
+          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('modal-container').innerHTML = ''">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-primary px-3 fw-semibold">Save</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

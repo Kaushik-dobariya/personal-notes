@@ -1,0 +1,155 @@
+<div class="col-12 col-md-6 col-xl-4" id="note-card-{{ note.id }}">
+  <div class="card note-card h-100 shadow-sm {% if note.is_pinned and not note.is_deleted %}is-pinned{% endif %}">
+    <div class="card-body">
+      
+      <!-- Card Header: Category & Pin Indicator -->
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <!-- Inline Category Dropdown / Badge -->
+        <div class="dropdown">
+          {% if not note.is_deleted %}
+          <button class="btn btn-sm btn-link p-0 text-decoration-none dropdown-toggle d-flex align-items-center" 
+                  type="button" 
+                  data-bs-toggle="dropdown" 
+                  aria-expanded="false" 
+                  style="font-size: 0.775rem;">
+            {% if note.category %}
+              <span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background-color: {{ note.category.color }};"></span>
+              <span class="fw-semibold text-muted">{{ note.category.name }}</span>
+            {% else %}
+              <span class="text-muted fst-italic"><i class="bi bi-folder me-1"></i>No Category</span>
+            {% endif %}
+          </button>
+          <ul class="dropdown-menu shadow-sm border-0 py-1" style="font-size: 0.8rem;">
+            <li><h6 class="dropdown-header py-1" style="font-size: 0.7rem;">Change Category</h6></li>
+            <li>
+              <button class="dropdown-item py-1 {% if not note.category_id %}active{% endif %}"
+                      hx-patch="/notes/{{ note.id }}/category"
+                      hx-vals='{"category_id": null}'
+                      hx-target="#note-card-{{ note.id }}"
+                      hx-swap="outerHTML">
+                <i class="bi bi-dash-circle me-1"></i> None
+              </button>
+            </li>
+            {% for cat in all_categories %}
+            <li>
+              <button class="dropdown-item py-1 d-flex align-items-center {% if note.category_id == cat.id %}active{% endif %}"
+                      hx-patch="/notes/{{ note.id }}/category"
+                      hx-vals='{"category_id": {{ cat.id }} }'
+                      hx-target="#note-card-{{ note.id }}"
+                      hx-swap="outerHTML">
+                <span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background-color: {{ cat.color }};"></span>
+                {{ cat.name }}
+              </button>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+            {% if note.category %}
+              <span class="small text-muted"><i class="bi bi-folder me-1"></i>{{ note.category.name }}</span>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <!-- Pin Status Indicator / Quick Pin Toggle -->
+        {% if not note.is_deleted %}
+        <button class="quick-action-btn {% if note.is_pinned %}active-pin{% endif %}"
+                title="{{ 'Unpin Note' if note.is_pinned else 'Pin to Top' }}"
+                hx-patch="/notes/{{ note.id }}/toggle-pin"
+                hx-target="#note-card-{{ note.id }}"
+                hx-swap="outerHTML">
+          <i class="bi {{ 'bi-pin-angle-fill' if note.is_pinned else 'bi-pin-angle' }}"></i>
+        </button>
+        {% endif %}
+      </div>
+
+      <!-- Inline Title -->
+      {% include "partials/inline_title_view.html" %}
+
+      <!-- Inline Content -->
+      {% include "partials/inline_content_view.html" %}
+
+      <!-- Quick Append Form (Active Notes Only) -->
+      {% if not note.is_deleted %}
+      <form class="mb-3"
+            hx-post="/notes/{{ note.id }}/append"
+            hx-target="#note-content-container-{{ note.id }}"
+            hx-swap="outerHTML"
+            hx-on::after-request="this.reset()">
+        <div class="input-group input-group-sm">
+          <input type="text" 
+                 name="text" 
+                 class="form-control form-control-sm py-1" 
+                 placeholder="Append thought..." 
+                 style="font-size: 0.8rem;"
+                 required>
+          <button class="btn btn-outline-primary btn-sm py-1 px-2" type="submit" title="Append to content">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+      </form>
+      {% endif %}
+
+      <!-- Inline Tags -->
+      {% include "partials/note_tags.html" %}
+
+      <!-- Card Footer Actions & Date -->
+      <div class="d-flex justify-content-between align-items-center pt-2 mt-auto border-top" style="border-color: var(--card-border) !important;">
+        <span class="text-muted" style="font-size: 0.725rem;" title="Updated at {{ note.updated_at.strftime('%Y-%m-%d %H:%M') }}">
+          <i class="bi bi-clock me-1"></i>{{ note.updated_at.strftime('%b %d') }}
+        </span>
+
+        <div class="d-flex align-items-center gap-1">
+          {% if note.is_deleted %}
+            <!-- Trash Actions: Restore or Permanent Delete -->
+            <button class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill"
+                    style="font-size: 0.75rem;"
+                    title="Restore Note"
+                    hx-patch="/notes/{{ note.id }}/restore"
+                    hx-target="#note-card-{{ note.id }}"
+                    hx-swap="outerHTML">
+              <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
+            </button>
+            <button class="btn btn-sm btn-outline-danger py-0 px-2 rounded-pill"
+                    style="font-size: 0.75rem;"
+                    title="Permanently Delete Note"
+                    hx-delete="/notes/{{ note.id }}/permanent"
+                    hx-confirm="Are you sure you want to permanently delete this note? This action cannot be undone."
+                    hx-target="#note-card-{{ note.id }}"
+                    hx-swap="outerHTML">
+              <i class="bi bi-trash3-fill"></i>
+            </button>
+          {% else %}
+            <!-- Active Quick Action Buttons -->
+            <!-- Favorite Toggle -->
+            <button class="quick-action-btn {% if note.is_favorite %}active-favorite{% endif %}"
+                    title="{{ 'Remove from Favorites' if note.is_favorite else 'Mark as Favorite' }}"
+                    hx-patch="/notes/{{ note.id }}/toggle-favorite"
+                    hx-target="#note-card-{{ note.id }}"
+                    hx-swap="outerHTML">
+              <i class="bi {{ 'bi-heart-fill' if note.is_favorite else 'bi-heart' }}"></i>
+            </button>
+
+            <!-- Archive Toggle -->
+            <button class="quick-action-btn {% if note.is_archived %}active-archive{% endif %}"
+                    title="{{ 'Unarchive Note' if note.is_archived else 'Archive Note' }}"
+                    hx-patch="/notes/{{ note.id }}/toggle-archive"
+                    hx-target="#note-card-{{ note.id }}"
+                    hx-swap="outerHTML">
+              <i class="bi {{ 'bi-archive-fill' if note.is_archived else 'bi-archive' }}"></i>
+            </button>
+
+            <!-- Soft Delete -->
+            <button class="quick-action-btn text-danger-hover"
+                    title="Move to Trash"
+                    hx-delete="/notes/{{ note.id }}"
+                    hx-target="#note-card-{{ note.id }}"
+                    hx-swap="outerHTML">
+              <i class="bi bi-trash"></i>
+            </button>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

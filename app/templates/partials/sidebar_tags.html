@@ -1,0 +1,26 @@
+<div class="d-flex flex-wrap gap-1 px-1">
+  {% for tag in all_tags %}
+  <div class="btn-group btn-group-sm mb-1" role="group" id="sidebar-tag-{{ tag.id }}">
+    <a href="/?tag_id={{ tag.id }}" class="btn btn-sm {% if current_tag_id == tag.id %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-start-pill py-0 px-2" style="font-size: 0.75rem;">
+      #{{ tag.name }}
+    </a>
+    <button type="button" class="btn btn-sm {% if current_tag_id == tag.id %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-end-pill py-0 px-1 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.75rem;">
+      <span class="visually-hidden">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end py-1 shadow-sm border-0" style="font-size: 0.8rem;">
+      <li>
+        <button class="dropdown-item py-1" hx-get="/tags/{{ tag.id }}/edit-modal" hx-target="#modal-container">
+          <i class="bi bi-pencil me-1"></i> Rename
+        </button>
+      </li>
+      <li>
+        <button class="dropdown-item py-1 text-danger" hx-delete="/tags/{{ tag.id }}" hx-confirm="Are you sure you want to delete tag '#{{ tag.name }}'?" hx-target="#sidebar-tags-list">
+          <i class="bi bi-trash me-1"></i> Delete
+        </button>
+      </li>
+    </ul>
+  </div>
+  {% else %}
+  <div class="px-2 text-muted small fst-italic">No tags created yet.</div>
+  {% endfor %}
+</div>

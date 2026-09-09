@@ -1,0 +1,51 @@
+<div class="modal fade show d-block" id="categoryModal" tabindex="-1" aria-modal="true" role="dialog" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow rounded-3">
+      
+      <div class="modal-header border-bottom py-2" style="border-color: var(--card-border) !important;">
+        <h5 class="modal-title fw-bold fs-6">
+          <i class="bi bi-folder-plus me-1 text-primary"></i> 
+          {% if category %}Edit Category{% else %}New Category{% endif %}
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" onclick="document.getElementById('modal-container').innerHTML = ''"></button>
+      </div>
+
+      <form {% if category %}hx-put="/categories/{{ category.id }}"{% else %}hx-post="/categories"{% endif %}
+            hx-target="#sidebar-categories-list"
+            hx-swap="innerHTML">
+        <div class="modal-body py-3">
+          <div class="mb-3">
+            <label for="cat_name" class="form-label small fw-semibold">Category Name</label>
+            <input type="text" 
+                   class="form-control form-control-sm" 
+                   id="cat_name" 
+                   name="name" 
+                   value="{{ category.name if category else '' }}" 
+                   placeholder="E.g. Work, Personal, Study" 
+                   required 
+                   autofocus>
+          </div>
+
+          <div class="mb-2">
+            <label for="cat_color" class="form-label small fw-semibold">Color Tag</label>
+            <div class="d-flex align-items-center gap-2">
+              <input type="color" 
+                     class="form-control form-control-color form-control-sm border-0 p-0" 
+                     id="cat_color" 
+                     name="color" 
+                     value="{{ category.color if category else '#4f46e5' }}" 
+                     title="Choose color">
+              <span class="small text-muted">Select an accent color</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top py-2" style="border-color: var(--card-border) !important;">
+          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('modal-container').innerHTML = ''">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-primary px-3 fw-semibold">Save</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<form id="note-content-container-{{ note.id }}" 
+      class="mb-3 flex-grow-1 d-flex flex-column"
+      hx-put="/notes/{{ note.id }}/content"
+      hx-target="#note-content-container-{{ note.id }}"
+      hx-swap="outerHTML">
+  <div class="mb-2">
+    <textarea name="content" 
+              class="form-control form-control-sm" 
+              rows="5" 
+              placeholder="Enter note content..."
+              autofocus
+              onkeydown="if(event.key==='Escape'){ document.getElementById('cancel-content-{{ note.id }}').click(); }">{{ note.content }}</textarea>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <button type="submit" class="btn btn-sm btn-primary py-1 px-3" title="Save Content">
+      <i class="bi bi-check-lg me-1"></i>Save
+    </button>
+    <button type="button" 
+            id="cancel-content-{{ note.id }}"
+            class="btn btn-sm btn-outline-secondary py-1 px-3" 
+            title="Cancel Editing"
+            hx-get="/notes/{{ note.id }}/content"
+            hx-target="#note-content-container-{{ note.id }}"
+            hx-swap="outerHTML">
+      Cancel
+    </button>
+  </div>
+</form>

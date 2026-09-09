@@ -1,0 +1,53 @@
+<div class="row g-3 mb-4" id="dashboard-stats">
+  <!-- Total Active Notes -->
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div>
+        <div class="text-muted small fw-semibold">Total Notes</div>
+        <div class="fs-4 fw-bold mt-1" id="stat-total">{{ stats.total_notes }}</div>
+      </div>
+      <div class="stat-icon-wrapper bg-primary-subtle text-primary">
+        <i class="bi bi-journal-text"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorites -->
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div>
+        <div class="text-muted small fw-semibold">Favorites</div>
+        <div class="fs-4 fw-bold mt-1 text-danger" id="stat-favorites">{{ stats.favorites }}</div>
+      </div>
+      <div class="stat-icon-wrapper bg-danger-subtle text-danger">
+        <i class="bi bi-heart-fill"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pinned Notes -->
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div>
+        <div class="text-muted small fw-semibold">Pinned</div>
+        <div class="fs-4 fw-bold mt-1 text-warning" id="stat-pinned">{{ stats.pinned }}</div>
+      </div>
+      <div class="stat-icon-wrapper bg-warning-subtle text-warning">
+        <i class="bi bi-pin-angle-fill"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Archived -->
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div>
+        <div class="text-muted small fw-semibold">Archived</div>
+        <div class="fs-4 fw-bold mt-1 text-info" id="stat-archived">{{ stats.archived }}</div>
+      </div>
+      <div class="stat-icon-wrapper bg-info-subtle text-info">
+        <i class="bi bi-archive-fill"></i>
+      </div>
+    </div>
+  </div>
+</div>

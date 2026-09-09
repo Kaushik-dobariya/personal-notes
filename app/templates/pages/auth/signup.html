@@ -1,0 +1,62 @@
+{% extends "layouts/auth.html" %}
+
+{% block title %}Create Account - Personal Notes{% endblock %}
+
+{% block content %}
+<div class="card auth-card shadow-sm border-0 p-4">
+  <h2 class="h5 fw-bold mb-3 text-center">Create Your Account</h2>
+
+  {% if error %}
+  <div class="alert alert-danger alert-dismissible fade show small py-2" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ error }}
+    <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endif %}
+
+  <form method="POST" action="/auth/signup" class="needs-validation">
+    <div class="mb-3">
+      <label for="full_name" class="form-label small fw-semibold">Full Name</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-person"></i></span>
+        <input type="text" class="form-control" id="full_name" name="full_name" value="{{ full_name or '' }}" placeholder="John Doe" required autofocus>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label small fw-semibold">Email Address</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+        <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" placeholder="you@example.com" required>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label small fw-semibold">Password</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+        <input type="password" class="form-control" id="password" name="password" placeholder="At least 8 characters" minlength="8" required>
+      </div>
+      <div class="form-text small">Minimum 8 characters.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="confirm_password" class="form-label small fw-semibold">Confirm Password</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
+        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter password" minlength="8" required>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mt-2">
+      Sign Up
+    </button>
+  </form>
+
+  <div class="text-center mt-4 pt-2 border-top">
+    <p class="small text-muted mb-0">
+      Already have an account? 
+      <a href="/auth/login" class="text-primary fw-semibold text-decoration-none">Sign In</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

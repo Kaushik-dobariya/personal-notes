@@ -1,0 +1,28 @@
+<aside class="sidebar p-3 d-flex flex-column" id="sidebar-menu">
+  
+  <!-- Main Navigation Links -->
+  <div class="mb-4">
+    <div class="text-uppercase text-muted small fw-bold mb-2 ps-2" style="font-size: 0.75rem; letter-spacing: 0.5px;">Navigation</div>
+    <ul class="nav nav-pills flex-column gap-1">
+      <li class="nav-item">
+        <a href="/" class="sidebar-link {% if request.url.path == '/' or request.url.path == '/notes' %}active{% endif %}">
+          <i class="bi bi-journal-text me-2 fs-6"></i>
+          <span>My Notes</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/notes/new" class="sidebar-link {% if request.url.path == '/notes/new' %}active{% endif %}">
+          <i class="bi bi-plus-circle me-2 fs-6 text-primary"></i>
+          <span>Create Note</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/profile" class="sidebar-link {% if '/profile' in request.url.path %}active{% endif %}">
+          <i class="bi bi-person-gear me-2 fs-6"></i>
+          <span>Account Settings</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+</aside>

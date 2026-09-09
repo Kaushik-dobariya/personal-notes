@@ -1,0 +1,35 @@
+<form id="note-content-container-{{ note.id }}" 
+      class="mb-3 flex-grow-1 d-flex flex-column"
+      hx-post="/notes/{{ note.id }}/append"
+      hx-target="#note-content-container-{{ note.id }}"
+      hx-swap="outerHTML">
+  <div class="small text-muted mb-1 fw-semibold d-flex align-items-center">
+    <i class="bi bi-plus-circle-fill me-1 text-primary"></i>Append to note:
+  </div>
+  <div class="mb-2">
+    <textarea name="text" 
+              class="form-control form-control-sm {% if error %}is-invalid{% endif %}" 
+              rows="3" 
+              placeholder="Write text to append..."
+              required
+              autofocus
+              onkeydown="if(event.key==='Escape'){ document.getElementById('cancel-append-{{ note.id }}').click(); }">{{ text if text is defined else '' }}</textarea>
+    {% if error %}
+      <div class="text-danger small mt-1" style="font-size: 0.78rem;">{{ error }}</div>
+    {% endif %}
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <button type="submit" class="btn btn-sm btn-primary py-1 px-3" title="Append Text">
+      <i class="bi bi-check-lg me-1"></i>Append
+    </button>
+    <button type="button" 
+            id="cancel-append-{{ note.id }}"
+            class="btn btn-sm btn-outline-secondary py-1 px-3" 
+            title="Cancel Append"
+            hx-get="/notes/{{ note.id }}/content"
+            hx-target="#note-content-container-{{ note.id }}"
+            hx-swap="outerHTML">
+      Cancel
+    </button>
+  </div>
+</form>

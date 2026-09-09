@@ -1,0 +1,14 @@
+<div class="d-flex align-items-center justify-content-between mb-2" id="note-title-container-{{ note.id }}">
+  <h3 class="h5 card-title fw-bold text-break mb-0 editable-title flex-grow-1 d-flex align-items-center justify-content-between"
+      title="Click to edit title"
+      role="button"
+      tabindex="0"
+      hx-get="/notes/{{ note.id }}/title/edit"
+      hx-target="#note-title-container-{{ note.id }}"
+      hx-swap="outerHTML">
+    <span class="text-truncate">{{ note.title }}</span>
+    <span class="text-muted opacity-50 ms-2" title="Edit title" aria-label="Edit title">
+      <i class="bi bi-pencil" style="font-size: 0.8rem;"></i>
+    </span>
+  </h3>
+</div>

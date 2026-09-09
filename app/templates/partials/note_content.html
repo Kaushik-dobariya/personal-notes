@@ -1,0 +1,36 @@
+<div id="note-content-container-{{ note.id }}" class="mb-3 flex-grow-1 d-flex flex-column">
+  <!-- Clickable Content Body -->
+  <div class="editable-content text-muted small flex-grow-1 mb-2 p-2 rounded"
+       style="min-height: 4.5rem; max-height: 12rem; overflow-y: auto; white-space: pre-line; word-break: break-word;"
+       title="Click to edit content"
+       hx-get="/notes/{{ note.id }}/content/edit"
+       hx-target="#note-content-container-{{ note.id }}"
+       hx-swap="outerHTML">
+    {% if note.content %}
+      {{ note.content }}
+    {% else %}
+      <span class="fst-italic opacity-50"><i class="bi bi-pencil me-1"></i>Click to add content...</span>
+    {% endif %}
+  </div>
+
+  <!-- Content Action Triggers -->
+  <div class="d-flex align-items-center justify-content-end gap-2 pt-1 border-top" style="border-color: var(--card-border) !important; font-size: 0.78rem;">
+    <button type="button" 
+            class="btn btn-link btn-sm p-0 text-decoration-none text-muted" 
+            title="Edit note content"
+            hx-get="/notes/{{ note.id }}/content/edit"
+            hx-target="#note-content-container-{{ note.id }}"
+            hx-swap="outerHTML">
+      <i class="bi bi-pencil me-1"></i>Edit Content
+    </button>
+    <span class="text-muted opacity-50">|</span>
+    <button type="button" 
+            class="btn btn-link btn-sm p-0 text-decoration-none text-primary fw-semibold" 
+            title="Append to this note"
+            hx-get="/notes/{{ note.id }}/append"
+            hx-target="#note-content-container-{{ note.id }}"
+            hx-swap="outerHTML">
+      <i class="bi bi-plus-circle me-1"></i>Append
+    </button>
+  </div>
+</div>

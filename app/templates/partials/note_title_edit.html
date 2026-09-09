@@ -1,0 +1,31 @@
+<form class="mb-2" id="note-title-container-{{ note.id }}"
+      hx-post="/notes/{{ note.id }}/title"
+      hx-target="#note-title-container-{{ note.id }}"
+      hx-swap="outerHTML">
+  <div class="input-group input-group-sm">
+    <input type="text" 
+           name="title" 
+           value="{{ title if title is defined else note.title }}" 
+           class="form-control form-control-sm fw-bold {% if error %}is-invalid{% endif %}" 
+           placeholder="Note title..."
+           required 
+           maxlength="255"
+           autofocus
+           onkeydown="if(event.key==='Escape'){ document.getElementById('cancel-title-{{ note.id }}').click(); }">
+    <button type="submit" class="btn btn-sm btn-primary" title="Save Title">
+      <i class="bi bi-check-lg"></i>
+    </button>
+    <button type="button" 
+            id="cancel-title-{{ note.id }}"
+            class="btn btn-sm btn-outline-secondary" 
+            title="Cancel"
+            hx-get="/notes/{{ note.id }}/title"
+            hx-target="#note-title-container-{{ note.id }}"
+            hx-swap="outerHTML">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+  {% if error %}
+    <div class="text-danger small mt-1" style="font-size: 0.78rem;">{{ error }}</div>
+  {% endif %}
+</form>
