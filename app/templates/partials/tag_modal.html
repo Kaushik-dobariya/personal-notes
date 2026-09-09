@@ -11,18 +11,25 @@
       </div>
 
       <form {% if tag %}hx-put="/tags/{{ tag.id }}"{% else %}hx-post="/tags"{% endif %}
-            hx-target="#sidebar-tags-list"
+            hx-target="#modal-container"
             hx-swap="innerHTML">
         <div class="modal-body py-3">
+          {% if error %}
+          <div class="alert alert-danger py-2 px-3 small mb-3 d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2 flex-shrink-0"></i>
+            <div>{{ error }}</div>
+          </div>
+          {% endif %}
+
           <div class="mb-2">
             <label for="tag_name_input" class="form-label small fw-semibold">Tag Name</label>
             <div class="input-group input-group-sm">
               <span class="input-group-text">#</span>
               <input type="text" 
-                     class="form-control form-control-sm" 
+                     class="form-control form-control-sm {% if error %}is-invalid{% endif %}" 
                      id="tag_name_input" 
                      name="name" 
-                     value="{{ tag.name if tag else '' }}" 
+                     value="{{ name if name is defined and name is not none else (tag.name if tag else '') }}" 
                      placeholder="e.g. project, urgent" 
                      required 
                      autofocus>

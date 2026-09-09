@@ -801,10 +801,17 @@ async def get_note_tags_selector(
 
     from app.services.tag_service import TagService
     all_tags = await TagService(db).get_user_tags(current_user.id)
+    note_tag_ids = {tag.id for tag in note.tags}
+    available_tags = [t for t in all_tags if t.id not in note_tag_ids]
     return templates.TemplateResponse(
         request=request,
         name="partials/tag_selector.html",
-        context={"note": note, "all_tags": all_tags, "current_user": current_user}
+        context={
+            "note": note,
+            "all_tags": all_tags,
+            "available_tags": available_tags,
+            "current_user": current_user
+        }
     )
 
 
@@ -848,10 +855,13 @@ async def add_tag_to_note(
     if is_json:
         return JSONResponse(content=NoteOut.model_validate(updated_note).model_dump(mode="json"))
 
+    from app.services.tag_service import TagService
+    all_tags = await TagService(db).get_user_tags(current_user.id)
+
     return templates.TemplateResponse(
         request=request,
         name="partials/note_tags.html",
-        context={"note": updated_note, "current_user": current_user}
+        context={"note": updated_note, "all_tags": all_tags, "current_user": current_user}
     )
 
 

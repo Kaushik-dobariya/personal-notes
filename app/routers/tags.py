@@ -142,13 +142,29 @@ async def create_tag(
     try:
         data = TagCreate(name=raw_name)
     except ValidationError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.errors()[0]["msg"])
+        err_msg = e.errors()[0]["msg"]
+        if is_json:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=err_msg)
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/tag_modal.html",
+            context={"tag": None, "error": err_msg, "name": raw_name},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
     service = TagService(db)
     try:
         created = await service.create_tag(current_user.id, data.name)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        err_msg = str(e)
+        if is_json:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=err_msg)
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/tag_modal.html",
+            context={"tag": None, "error": err_msg, "name": raw_name},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
     if is_json:
         return JSONResponse(
@@ -157,11 +173,11 @@ async def create_tag(
         )
 
     all_tags = await service.get_user_tags(current_user.id)
-    response.headers["HX-Trigger"] = "closeModal"
     return templates.TemplateResponse(
         request=request,
-        name="partials/sidebar_tags.html",
-        context={"all_tags": all_tags, "current_tag_id": None}
+        name="partials/tag_modal_success.html",
+        context={"all_tags": all_tags, "current_tag_id": None},
+        headers={"HX-Trigger": "closeModal"}
     )
 
 
@@ -182,18 +198,39 @@ async def update_tag(
         form = await request.form()
         raw_name = form.get("name", "")
 
+    service = TagService(db)
+
     try:
         data = TagCreate(name=raw_name)
     except ValidationError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.errors()[0]["msg"])
+        err_msg = e.errors()[0]["msg"]
+        if is_json:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=err_msg)
+        tag = await service.get_tag(current_user.id, tag_id)
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/tag_modal.html",
+            context={"tag": tag, "error": err_msg, "name": raw_name},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
-    service = TagService(db)
     try:
         updated = await service.rename_tag(current_user.id, tag_id, data.name)
     except ValueError as e:
         err_str = str(e)
         status_code = status.HTTP_404_NOT_FOUND if "not found" in err_str.lower() else status.HTTP_400_BAD_REQUEST
-        raise HTTPException(status_code=status_code, detail=err_str)
+        if is_json:
+            raise HTTPException(status_code=status_code, detail=err_str)
+        target = request.headers.get("HX-Target", "")
+        if target.startswith("tag-item-"):
+            return HTMLResponse(content=f'<div class="text-danger small">{err_str}</div>', status_code=400)
+        tag = await service.get_tag(current_user.id, tag_id)
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/tag_modal.html",
+            context={"tag": tag, "error": err_str, "name": raw_name},
+            status_code=status_code
+        )
 
     if is_json:
         return JSONResponse(content=TagOut.model_validate(updated).model_dump(mode="json"))
@@ -207,11 +244,11 @@ async def update_tag(
         )
 
     all_tags = await service.get_user_tags(current_user.id)
-    response.headers["HX-Trigger"] = "closeModal"
     return templates.TemplateResponse(
         request=request,
-        name="partials/sidebar_tags.html",
-        context={"all_tags": all_tags, "current_tag_id": tag_id}
+        name="partials/tag_modal_success.html",
+        context={"all_tags": all_tags, "current_tag_id": tag_id},
+        headers={"HX-Trigger": "closeModal"}
     )
 
 

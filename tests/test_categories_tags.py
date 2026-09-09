@@ -445,3 +445,77 @@ async def test_create_and_edit_note_with_category_and_tags(client: AsyncClient, 
     assert "asia" in new_tag_names
     assert "adventure" in new_tag_names
     assert "vacation" not in new_tag_names
+
+
+@pytest.mark.asyncio
+async def test_modal_error_handling_and_realtime_sidebar_updates(client: AsyncClient, db_session: AsyncSession):
+    # 1. Register User
+    await client.post("/auth/signup", data={
+        "full_name": "Modal UX Tester",
+        "email": "modal_ux@example.com",
+        "password": "Password123!",
+        "confirm_password": "Password123!"
+    })
+
+    # 2. Open Category Modal
+    modal_resp = await client.get("/categories/modal")
+    assert modal_resp.status_code == 200
+    assert 'hx-target="#modal-container"' in modal_resp.text
+
+    # 3. Create Category -> Success should return OOB swap and closeModal trigger
+    save_cat = await client.post("/categories", data={"name": "Engineering", "color": "#2563eb"})
+    assert save_cat.status_code == 200
+    assert save_cat.headers.get("HX-Trigger") == "closeModal"
+    assert 'id="sidebar-categories-list" hx-swap-oob="innerHTML"' in save_cat.text
+    assert "Engineering" in save_cat.text
+
+    # 4. Create Duplicate Category -> Should return 400 with error alert inside modal
+    dup_cat = await client.post("/categories", data={"name": "Engineering", "color": "#ef4444"})
+    assert dup_cat.status_code == 400
+    assert "alert alert-danger" in dup_cat.text
+    assert "already exists" in dup_cat.text
+    assert "Engineering" in dup_cat.text
+    assert 'value="Engineering"' in dup_cat.text
+
+    # 5. Open Tag Modal
+    tag_modal_resp = await client.get("/tags/modal")
+    assert tag_modal_resp.status_code == 200
+    assert 'hx-target="#modal-container"' in tag_modal_resp.text
+
+    # 6. Create Tag -> Success should return OOB swap and closeModal trigger
+    save_tag = await client.post("/tags", data={"name": "devops"})
+    assert save_tag.status_code == 200
+    assert save_tag.headers.get("HX-Trigger") == "closeModal"
+    assert 'id="sidebar-tags-list" hx-swap-oob="innerHTML"' in save_tag.text
+    assert "devops" in save_tag.text
+
+    # 7. Create Duplicate Tag -> Should return 400 with error alert inside modal
+    dup_tag = await client.post("/tags", data={"name": "DEVOPS"})
+    assert dup_tag.status_code == 400
+    assert "alert alert-danger" in dup_tag.text
+    assert "already exists" in dup_tag.text
+    assert "devops" in dup_tag.text
+
+    # 8. Create a Note
+    await client.post("/notes", data={"title": "DevOps Roadmap", "content": "CI/CD setup."})
+    note = (await db_session.execute(select(Note).where(Note.title == "DevOps Roadmap"))).scalar_one()
+
+    # 9. Get Tag Selector for note -> Should display existing tag 'devops' in selectable chips
+    selector_resp = await client.get(f"/notes/{note.id}/tags/selector")
+    assert selector_resp.status_code == 200
+    assert "Select existing tag:" in selector_resp.text
+    assert "#devops" in selector_resp.text
+
+    # 10. Add existing tag by tag_id -> Note gets tag AND sidebar tags list is real-time updated via OOB
+    add_existing_resp = await client.post(f"/notes/{note.id}/tags", data={"tag_id": str((await db_session.execute(select(Tag).where(Tag.name == "devops"))).scalar_one().id)})
+    assert add_existing_resp.status_code == 200
+    assert "#devops" in add_existing_resp.text
+    assert 'id="sidebar-tags-list" hx-swap-oob="innerHTML"' in add_existing_resp.text
+
+    # 11. Add a BRAND NEW tag under the note -> Real-time creates tag and updates sidebar
+    add_new_tag_resp = await client.post(f"/notes/{note.id}/tags", data={"name": "kubernetes"})
+    assert add_new_tag_resp.status_code == 200
+    assert "#kubernetes" in add_new_tag_resp.text
+    assert 'id="sidebar-tags-list" hx-swap-oob="innerHTML"' in add_new_tag_resp.text
+    assert "kubernetes" in add_new_tag_resp.text
+

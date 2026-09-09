@@ -11,16 +11,23 @@
       </div>
 
       <form {% if category %}hx-put="/categories/{{ category.id }}"{% else %}hx-post="/categories"{% endif %}
-            hx-target="#sidebar-categories-list"
+            hx-target="#modal-container"
             hx-swap="innerHTML">
         <div class="modal-body py-3">
+          {% if error %}
+          <div class="alert alert-danger py-2 px-3 small mb-3 d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2 flex-shrink-0"></i>
+            <div>{{ error }}</div>
+          </div>
+          {% endif %}
+
           <div class="mb-3">
             <label for="cat_name" class="form-label small fw-semibold">Category Name</label>
             <input type="text" 
-                   class="form-control form-control-sm" 
+                   class="form-control form-control-sm {% if error %}is-invalid{% endif %}" 
                    id="cat_name" 
                    name="name" 
-                   value="{{ category.name if category else '' }}" 
+                   value="{{ name if name is defined and name is not none else (category.name if category else '') }}" 
                    placeholder="E.g. Work, Personal, Study" 
                    required 
                    autofocus>
@@ -33,7 +40,7 @@
                      class="form-control form-control-color form-control-sm border-0 p-0" 
                      id="cat_color" 
                      name="color" 
-                     value="{{ category.color if category else '#4f46e5' }}" 
+                     value="{{ color if color is defined and color is not none else (category.color if category else '#4f46e5') }}" 
                      title="Choose color">
               <span class="small text-muted">Select an accent color</span>
             </div>

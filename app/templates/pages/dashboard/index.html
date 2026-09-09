@@ -4,9 +4,11 @@
 
 {% block content %}
 <div class="container-fluid px-0">
-  
+
   <!-- Dashboard Header -->
-  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--card-border) !important;">
+  <div
+    class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 pb-3 border-bottom"
+    style="border-color: var(--card-border) !important;">
     <div>
       <h1 class="h4 fw-bold mb-1 d-flex align-items-center">
         <i class="bi bi-journal-text text-primary me-2"></i> My Notes
@@ -15,27 +17,30 @@
       <p class="text-muted small mb-0">Manage and edit your notes inline with zero page reloads.</p>
     </div>
 
-    <div>
+    <!-- <div>
       <a href="/notes/new{% if current_category_id %}?category_id={{ current_category_id }}{% endif %}" class="btn btn-primary rounded-pill px-3 d-flex align-items-center shadow-sm">
         <i class="bi bi-plus-lg me-1"></i> New Note
       </a>
-    </div>
+    </div> -->
   </div>
 
   <!-- Active Filter Banner -->
   {% if selected_category or selected_tag %}
-  <div class="d-flex align-items-center flex-wrap gap-2 mb-4 p-2 px-3 rounded bg-body-secondary border" style="font-size: 0.85rem;">
+  <div class="d-flex align-items-center flex-wrap gap-2 mb-4 p-2 px-3 rounded bg-body-secondary border"
+    style="font-size: 0.85rem;">
     <span class="text-muted fw-semibold"><i class="bi bi-funnel-fill me-1"></i> Filter active:</span>
     {% if selected_category %}
-      <span class="badge rounded-pill border d-inline-flex align-items-center px-2 py-1" style="background-color: {{ selected_category.color }}20; color: {{ selected_category.color }}; border-color: {{ selected_category.color }}50 !important;">
-        <span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background-color: {{ selected_category.color }};"></span>
-        Category: {{ selected_category.name }}
-      </span>
+    <span class="badge rounded-pill border d-inline-flex align-items-center px-2 py-1"
+      style="background-color: {{ selected_category.color }}20; color: {{ selected_category.color }}; border-color: {{ selected_category.color }}50 !important;">
+      <span class="d-inline-block rounded-circle me-1"
+        style="width: 8px; height: 8px; background-color: {{ selected_category.color }};"></span>
+      Category: {{ selected_category.name }}
+    </span>
     {% endif %}
     {% if selected_tag %}
-      <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
-        Tag: #{{ selected_tag.name }}
-      </span>
+    <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+      Tag: #{{ selected_tag.name }}
+    </span>
     {% endif %}
     <a href="/" class="btn btn-sm btn-link text-decoration-none ms-auto p-0 small">
       <i class="bi bi-x-circle me-1"></i>Clear Filter
@@ -45,93 +50,100 @@
 
   <!-- Notes Section -->
   {% if notes %}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="notes-grid">
-      {% for note in notes %}
-      <div class="col" id="note-card-col-{{ note.id }}">
-        <div class="card note-card h-100 shadow-sm" id="note-card-{{ note.id }}">
-          <div class="card-body d-flex flex-column">
-            
-            <!-- Category Assignment / Selector -->
-            {% include "partials/note_category.html" %}
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="notes-grid">
+    {% for note in notes %}
+    <div class="col" id="note-card-col-{{ note.id }}">
+      <div class="card note-card h-100 shadow-sm" id="note-card-{{ note.id }}">
+        <div class="card-body d-flex flex-column">
 
-            <!-- Inline Editable Title -->
-            {% include "partials/note_title.html" %}
+          <!-- Category Assignment / Selector -->
+          {% include "partials/note_category.html" %}
 
-            <!-- Inline Editable & Appendable Content -->
-            {% include "partials/note_content.html" %}
+          <!-- Inline Editable Title -->
+          {% include "partials/note_title.html" %}
 
-            <!-- Tags -->
-            {% include "partials/note_tags.html" %}
+          <!-- Inline Editable & Appendable Content -->
+          {% include "partials/note_content.html" %}
 
-            <!-- Timestamps -->
-            <div class="border-top pt-2 mt-auto mb-3 text-muted" style="font-size: 0.78rem; border-color: var(--card-border) !important;">
-              <div class="d-flex align-items-center justify-content-between mb-1">
-                <span><i class="bi bi-calendar-plus me-1 text-primary"></i> Created</span>
-                <span>{{ note.created_at.strftime('%b %d, %Y') }}</span>
-              </div>
-              <div class="d-flex align-items-center justify-content-between">
-                <span><i class="bi bi-clock-history me-1 text-info"></i> Updated</span>
-                <span id="note-updated-at-{{ note.id }}">{{ note.updated_at.strftime('%b %d, %Y') }}</span>
-              </div>
+          <!-- Tags -->
+          {% include "partials/note_tags.html" %}
+
+          <!-- Timestamps -->
+          <div class="border-top pt-2 mt-auto mb-3 text-muted"
+            style="font-size: 0.78rem; border-color: var(--card-border) !important;">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <span><i class="bi bi-calendar-plus me-1 text-primary"></i> Created</span>
+              <span>{{ note.created_at.strftime('%b %d, %Y') }}</span>
             </div>
-
-            <!-- Card Actions -->
-            <div class="d-flex align-items-center justify-content-between pt-2 border-top" style="border-color: var(--card-border) !important;">
-              <a href="/notes/{{ note.id }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3" title="Open full note view">
-                <i class="bi bi-eye me-1"></i> View
-              </a>
-              <div class="d-flex align-items-center gap-2">
-                <a href="/notes/{{ note.id }}/edit" class="btn btn-sm btn-outline-primary rounded-pill px-3" title="Open full edit page">
-                  <i class="bi bi-pencil me-1"></i> Full Edit
-                </a>
-                <form method="POST" action="/notes/{{ note.id }}/delete" onsubmit="return confirm('Are you sure you want to delete this note?');" class="d-inline">
-                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Delete Note">
-                    <i class="bi bi-trash3"></i>
-                  </button>
-                </form>
-              </div>
+            <div class="d-flex align-items-center justify-content-between">
+              <span><i class="bi bi-clock-history me-1 text-info"></i> Updated</span>
+              <span id="note-updated-at-{{ note.id }}">{{ note.updated_at.strftime('%b %d, %Y') }}</span>
             </div>
-
           </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <!-- Empty State -->
-    <div class="card border-dashed py-5 text-center my-4 shadow-sm" style="border: 2px dashed var(--card-border); background-color: var(--card-bg);">
-      <div class="card-body py-5">
-        <div class="display-5 text-muted mb-3">
-          <i class="bi bi-journal-plus text-primary opacity-75"></i>
-        </div>
-        <h2 class="h4 fw-bold mb-2">
-          {% if selected_category %}
-            No notes in category "{{ selected_category.name }}"
-          {% elif selected_tag %}
-            No notes tagged "#{{ selected_tag.name }}"
-          {% else %}
-            No notes yet
-          {% endif %}
-        </h2>
-        <p class="text-muted small mb-4" style="max-width: 420px; margin: 0 auto;">
-          {% if selected_category or selected_tag %}
-            Try clearing the filter or creating a new note with this category/tag.
-          {% else %}
-            You haven't created any notes yet. Click the button below to create your first note.
-          {% endif %}
-        </p>
-        <div class="d-flex align-items-center justify-content-center gap-2">
-          {% if selected_category or selected_tag %}
-            <a href="/" class="btn btn-outline-secondary rounded-pill px-3">
-              Clear Filter
+
+          <!-- Card Actions -->
+          <div class="d-flex align-items-center justify-content-between pt-2 border-top"
+            style="border-color: var(--card-border) !important;">
+            <a href="/notes/{{ note.id }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+              title="Open full note view">
+              <i class="bi bi-eye me-1"></i> View
             </a>
-          {% endif %}
-          <a href="/notes/new{% if current_category_id %}?category_id={{ current_category_id }}{% endif %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i> Create Note
-          </a>
+            <div class="d-flex align-items-center gap-2">
+              <a href="/notes/{{ note.id }}/edit" class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                title="Open full edit page">
+                <i class="bi bi-pencil me-1"></i> Full Edit
+              </a>
+              <form method="POST" action="/notes/{{ note.id }}/delete"
+                onsubmit="return confirm('Are you sure you want to delete this note?');" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Delete Note">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <!-- Empty State -->
+  <div class="card border-dashed py-5 text-center my-4 shadow-sm"
+    style="border: 2px dashed var(--card-border); background-color: var(--card-bg);">
+    <div class="card-body py-5">
+      <div class="display-5 text-muted mb-3">
+        <i class="bi bi-journal-plus text-primary opacity-75"></i>
+      </div>
+      <h2 class="h4 fw-bold mb-2">
+        {% if selected_category %}
+        No notes in category "{{ selected_category.name }}"
+        {% elif selected_tag %}
+        No notes tagged "#{{ selected_tag.name }}"
+        {% else %}
+        No notes yet
+        {% endif %}
+      </h2>
+      <p class="text-muted small mb-4" style="max-width: 420px; margin: 0 auto;">
+        {% if selected_category or selected_tag %}
+        Try clearing the filter or creating a new note with this category/tag.
+        {% else %}
+        You haven't created any notes yet. Click the button below to create your first note.
+        {% endif %}
+      </p>
+      <div class="d-flex align-items-center justify-content-center gap-2">
+        {% if selected_category or selected_tag %}
+        <a href="/" class="btn btn-outline-secondary rounded-pill px-3">
+          Clear Filter
+        </a>
+        {% endif %}
+        <a href="/notes/new{% if current_category_id %}?category_id={{ current_category_id }}{% endif %}"
+          class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+          <i class="bi bi-plus-lg me-1"></i> Create Note
+        </a>
+      </div>
+    </div>
+  </div>
   {% endif %}
 
 </div>

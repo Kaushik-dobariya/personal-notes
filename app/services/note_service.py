@@ -171,9 +171,11 @@ class NoteService:
         note_id: int,
         user_id: int,
         tag_name: Optional[str] = None,
-        tag_id: Optional[int] = None
+        tag_id: Optional[int] = None,
+        tag_ids: Optional[List[int]] = None,
+        tag_names: Optional[List[str]] = None
     ) -> Note:
-        """Attach a tag to note, verifying ownership of both note and tag."""
+        """Attach one or more tags to note, verifying ownership of note and all tags."""
         note = await self.note_repo.get_by_id(note_id, user_id)
         if not note:
             raise ValueError("Note not found.")
@@ -181,19 +183,41 @@ class NoteService:
         from app.repositories.tag_repo import TagRepository
         tag_repo = TagRepository(self.session)
 
-        if tag_id is not None:
-            tag = await tag_repo.get_by_id(tag_id, user_id)
-            if not tag:
-                raise ValueError("Tag not found or access denied.")
-        elif tag_name:
-            cleaned = tag_name.strip().lstrip("#").lower()
-            if not cleaned:
-                raise ValueError("Tag name cannot be empty.")
-            tag = await tag_repo.get_or_create(cleaned, user_id)
-        else:
+        # Collect tag IDs to attach
+        all_ids = [int(i) for i in tag_ids] if tag_ids else []
+        if tag_id is not None and tag_id not in all_ids:
+            all_ids.append(int(tag_id))
+
+        # Collect tag names to create/attach
+        all_names: List[str] = []
+        if tag_names:
+            for name_item in tag_names:
+                for sub in str(name_item).split(","):
+                    c = sub.strip().lstrip("#").lower()
+                    if c and c not in all_names:
+                        all_names.append(c)
+        if tag_name:
+            for sub in str(tag_name).split(","):
+                c = sub.strip().lstrip("#").lower()
+                if c and c not in all_names:
+                    all_names.append(c)
+
+        if not all_ids and not all_names:
             raise ValueError("Tag name or ID is required.")
 
-        return await self.note_repo.add_tag(note, tag)
+        # Attach by ID
+        for tid in all_ids:
+            tag = await tag_repo.get_by_id(tid, user_id)
+            if not tag:
+                raise ValueError("Tag not found or access denied.")
+            await self.note_repo.add_tag(note, tag)
+
+        # Attach by Name
+        for name in all_names:
+            tag = await tag_repo.get_or_create(name, user_id)
+            await self.note_repo.add_tag(note, tag)
+
+        return note
 
     async def remove_tag_from_note(self, note_id: int, user_id: int, tag_id: int) -> Note:
         """Remove a tag from note, verifying ownership of both note and tag."""

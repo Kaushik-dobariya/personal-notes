@@ -1,33 +1,69 @@
-<div id="note-tags-{{ note.id }}" class="note-tags-container mb-3">
-  <div class="d-flex align-items-center justify-content-between mb-1">
-    <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">Tags:</span>
+<div id="note-tags-{{ note.id }}" class="note-tags-container mb-3 p-2 rounded border bg-body-tertiary">
+  <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
+    <span class="fw-semibold text-muted" style="font-size: 0.75rem;">
+      <i class="bi bi-tag-fill me-1 text-primary"></i>Tags
+    </span>
     <button type="button" 
             class="btn btn-sm btn-link text-muted p-0 text-decoration-none" 
             style="font-size: 0.725rem;"
             hx-get="/notes/{{ note.id }}/tags"
             hx-target="#note-tags-{{ note.id }}"
             hx-swap="outerHTML">
-      Cancel
+      <i class="bi bi-check2 me-1"></i>Done
     </button>
   </div>
 
-  <div class="d-flex flex-wrap align-items-center gap-1 mb-2">
-    {% for tag in note.tags %}
-    <span class="badge rounded-pill bg-body-secondary text-body-emphasis border d-inline-flex align-items-center py-1 px-2" style="font-size: 0.75rem; font-weight: 500;">
-      #{{ tag.name }}
-      <button type="button" 
-              class="btn-close ms-1" 
-              style="font-size: 0.5rem; padding: 0.2rem;" 
-              aria-label="Remove tag"
-              title="Remove #{{ tag.name }}"
-              hx-delete="/notes/{{ note.id }}/tags/{{ tag.id }}"
-              hx-target="#note-tags-{{ note.id }}"
-              hx-swap="outerHTML"></button>
-    </span>
-    {% endfor %}
+  <!-- Current attached tags -->
+  {% if note.tags %}
+  <div class="mb-2">
+    <div class="text-muted small mb-1" style="font-size: 0.7rem;">Attached tags:</div>
+    <div class="d-flex flex-wrap align-items-center gap-1">
+      {% for tag in note.tags %}
+      <span class="badge rounded-pill bg-body-secondary text-body-emphasis border d-inline-flex align-items-center py-1 px-2" style="font-size: 0.75rem; font-weight: 500;">
+        #{{ tag.name }}
+        <button type="button" 
+                class="btn-close ms-1" 
+                style="font-size: 0.5rem; padding: 0.2rem;" 
+                aria-label="Remove tag"
+                title="Remove #{{ tag.name }}"
+                hx-delete="/notes/{{ note.id }}/tags/{{ tag.id }}"
+                hx-target="#note-tags-{{ note.id }}"
+                hx-swap="outerHTML"></button>
+      </span>
+      {% endfor %}
+    </div>
   </div>
+  {% endif %}
 
-  <form class="d-flex align-items-center gap-1"
+  <!-- Existing tags to select from -->
+  {% if available_tags and available_tags|length > 0 %}
+  <div class="mb-2">
+    <div class="text-muted small mb-1 fw-semibold" style="font-size: 0.7rem;">
+      <i class="bi bi-plus-circle text-primary me-1"></i>Select existing tag:
+    </div>
+    <div class="d-flex flex-wrap gap-1">
+      {% for t in available_tags %}
+      <button type="button" 
+              class="btn btn-sm btn-outline-secondary py-0 px-2 rounded-pill d-inline-flex align-items-center"
+              style="font-size: 0.725rem; background-color: var(--bs-body-bg);"
+              title="Click to add #{{ t.name }} to note"
+              hx-post="/notes/{{ note.id }}/tags"
+              hx-vals='{"tag_id": {{ t.id }}}'
+              hx-target="#note-tags-{{ note.id }}"
+              hx-swap="outerHTML">
+        <i class="bi bi-plus text-primary me-1"></i>#{{ t.name }}
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+  {% elif all_tags and all_tags|length > 0 %}
+  <div class="text-muted small fst-italic mb-2" style="font-size: 0.7rem;">
+    <i class="bi bi-check2-all text-success me-1"></i>All existing tags attached.
+  </div>
+  {% endif %}
+
+  <!-- Form to type and add a new or custom tag -->
+  <form class="d-flex align-items-center gap-1 mt-1"
         hx-post="/notes/{{ note.id }}/tags"
         hx-target="#note-tags-{{ note.id }}"
         hx-swap="outerHTML">
@@ -37,17 +73,16 @@
              name="name" 
              list="user-tags-datalist-{{ note.id }}"
              class="form-control form-control-sm py-0 px-2" 
-             placeholder="Tag name..." 
+             placeholder="Or type new tag..." 
              style="font-size: 0.75rem;"
              autocomplete="off"
-             required 
-             autofocus>
+             required>
       <datalist id="user-tags-datalist-{{ note.id }}">
         {% for t in all_tags %}
         <option value="{{ t.name }}">
         {% endfor %}
       </datalist>
-      <button class="btn btn-primary btn-sm py-0 px-2" type="submit" style="font-size: 0.75rem;">
+      <button class="btn btn-primary btn-sm py-0 px-2 fw-semibold" type="submit" style="font-size: 0.75rem;">
         Add
       </button>
     </div>

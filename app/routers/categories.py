@@ -137,13 +137,29 @@ async def create_category(
     try:
         data = CategoryCreate(name=raw_name, color=raw_color)
     except ValidationError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.errors()[0]["msg"])
+        err_msg = e.errors()[0]["msg"]
+        if is_json:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=err_msg)
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/category_modal.html",
+            context={"category": None, "error": err_msg, "name": raw_name, "color": raw_color},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
     service = CategoryService(db)
     try:
         created = await service.create_category(current_user.id, data)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        err_msg = str(e)
+        if is_json:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=err_msg)
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/category_modal.html",
+            context={"category": None, "error": err_msg, "name": raw_name, "color": raw_color},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
     if is_json:
         return JSONResponse(
@@ -152,11 +168,11 @@ async def create_category(
         )
 
     categories_with_counts = await service.get_user_categories_with_counts(current_user.id)
-    response.headers["HX-Trigger"] = "closeModal"
     return templates.TemplateResponse(
         request=request,
-        name="partials/sidebar_categories.html",
-        context={"categories_with_counts": categories_with_counts, "current_category_id": None}
+        name="partials/category_modal_success.html",
+        context={"categories_with_counts": categories_with_counts, "current_category_id": None},
+        headers={"HX-Trigger": "closeModal"}
     )
 
 
@@ -179,18 +195,45 @@ async def update_category(
         raw_name = form.get("name", None)
         raw_color = form.get("color", None)
 
+    service = CategoryService(db)
+
     try:
         data = CategoryUpdate(name=raw_name, color=raw_color)
     except ValidationError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.errors()[0]["msg"])
+        err_msg = e.errors()[0]["msg"]
+        if is_json:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=err_msg)
+        category = await service.get_category(current_user.id, category_id)
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/category_modal.html",
+            context={"category": category, "error": err_msg, "name": raw_name, "color": raw_color},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
-    service = CategoryService(db)
     try:
         updated = await service.update_category(current_user.id, category_id, data)
     except ValueError as e:
         err_str = str(e)
         status_code = status.HTTP_404_NOT_FOUND if "not found" in err_str.lower() else status.HTTP_400_BAD_REQUEST
-        raise HTTPException(status_code=status_code, detail=err_str)
+        if is_json:
+            raise HTTPException(status_code=status_code, detail=err_str)
+        target = request.headers.get("HX-Target", "")
+        if target.startswith("category-item-"):
+            category = await service.get_category(current_user.id, category_id)
+            return templates.TemplateResponse(
+                request=request,
+                name="partials/category_item_edit.html",
+                context={"category": category, "error": err_str},
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        category = await service.get_category(current_user.id, category_id)
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/category_modal.html",
+            context={"category": category, "error": err_str, "name": raw_name, "color": raw_color},
+            status_code=status_code
+        )
 
     if is_json:
         return JSONResponse(content=CategoryOut.model_validate(updated).model_dump(mode="json"))
@@ -206,11 +249,11 @@ async def update_category(
         )
 
     categories_with_counts = await service.get_user_categories_with_counts(current_user.id)
-    response.headers["HX-Trigger"] = "closeModal"
     return templates.TemplateResponse(
         request=request,
-        name="partials/sidebar_categories.html",
-        context={"categories_with_counts": categories_with_counts, "current_category_id": category_id}
+        name="partials/category_modal_success.html",
+        context={"categories_with_counts": categories_with_counts, "current_category_id": category_id},
+        headers={"HX-Trigger": "closeModal"}
     )
 
 

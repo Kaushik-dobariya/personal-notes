@@ -1,30 +1,30 @@
 <div id="note-tags-{{ note.id }}" class="note-tags-container mb-3">
   <div class="d-flex align-items-center justify-content-between mb-1">
     <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">Tags:</span>
-    <button class="btn btn-sm btn-link p-0 text-decoration-none" 
-            style="font-size: 0.725rem;"
-            hx-get="/notes/{{ note.id }}/tags/selector"
-            hx-target="#note-tags-{{ note.id }}"
-            hx-swap="outerHTML">
+    <button class="btn btn-sm btn-link p-0 text-decoration-none" style="font-size: 0.725rem;"
+      hx-get="/notes/{{ note.id }}/tags/selector" hx-target="#note-tags-{{ note.id }}" hx-swap="outerHTML">
       <i class="bi bi-plus-lg me-1"></i>Add Tag
     </button>
   </div>
 
   <div class="d-flex flex-wrap align-items-center gap-1">
     {% for tag in note.tags %}
-    <span class="badge rounded-pill bg-body-secondary text-body-emphasis border d-inline-flex align-items-center py-1 px-2" style="font-size: 0.75rem; font-weight: 500;">
+    <span
+      class="badge rounded-pill bg-body-secondary text-body-emphasis border d-inline-flex align-items-center py-1 px-2"
+      style="font-size: 0.75rem; font-weight: 500;">
       #{{ tag.name }}
-      <button type="button" 
-              class="btn-close ms-1" 
-              style="font-size: 0.5rem; padding: 0.2rem;" 
-              aria-label="Remove tag"
-              title="Remove #{{ tag.name }}"
-              hx-delete="/notes/{{ note.id }}/tags/{{ tag.id }}"
-              hx-target="#note-tags-{{ note.id }}"
-              hx-swap="outerHTML"></button>
+      <button type="button" class="btn-close ms-1" style="font-size: 0.5rem; padding: 0.2rem;" aria-label="Remove tag"
+        title="Remove #{{ tag.name }}" hx-delete="/notes/{{ note.id }}/tags/{{ tag.id }}"
+        hx-target="#note-tags-{{ note.id }}" hx-swap="outerHTML"></button>
     </span>
     {% else %}
     <span class="text-muted small fst-italic" style="font-size: 0.725rem;">No tags</span>
     {% endfor %}
   </div>
 </div>
+
+<!-- {% if all_tags is defined and all_tags is not none %}
+<div id="sidebar-tags-list" hx-swap-oob="innerHTML">
+  {% include "partials/sidebar_tags.html" %}
+</div> 
+{% endif %}-->

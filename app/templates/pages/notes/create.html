@@ -72,6 +72,19 @@
               <option value="{{ t.name }}">
               {% endfor %}
             </datalist>
+            {% if all_tags and all_tags|length > 0 %}
+            <div class="d-flex flex-wrap align-items-center gap-1 mt-1">
+              <span class="text-muted" style="font-size: 0.7rem;">Click to select:</span>
+              {% for t in all_tags %}
+              <button type="button" 
+                      class="btn btn-sm btn-outline-secondary py-0 px-2 rounded-pill d-inline-flex align-items-center" 
+                      style="font-size: 0.725rem;"
+                      onclick="addTagToInput('{{ t.name }}')">
+                <i class="bi bi-plus me-1 text-primary"></i>#{{ t.name }}
+              </button>
+              {% endfor %}
+            </div>
+            {% endif %}
             <div class="form-text" style="font-size: 0.75rem;">Comma-separated, tags are automatically normalized.</div>
           </div>
         </div>

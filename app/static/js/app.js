@@ -27,6 +27,33 @@
     }
   };
 
+  // Helper to add tag to tag input on Create/Edit pages
+  window.addTagToInput = function (tagName) {
+    const input = document.getElementById("tags");
+    if (!input) return;
+    const current = input.value
+      .split(",")
+      .map((t) => t.trim().replace(/^#/, ""))
+      .filter(Boolean);
+    const normalized = tagName.trim().replace(/^#/, "");
+    if (!current.includes(normalized)) {
+      current.push(normalized);
+      input.value = current.join(", ");
+    }
+  };
+
+  // Helper to close modals and cleanup backdrops
+  const closeModalHandler = () => {
+    const modalContainer = document.getElementById("modal-container");
+    if (modalContainer) {
+      modalContainer.innerHTML = "";
+    }
+    document.querySelectorAll(".modal-backdrop").forEach((el) => el.remove());
+    document.body.classList.remove("modal-open");
+    document.body.style.removeProperty("overflow");
+    document.body.style.removeProperty("padding-right");
+  };
+
   // Apply on immediate load
   setTheme(getPreferredTheme());
 
@@ -44,21 +71,20 @@
       });
     }
 
+    // Modal close event listener (triggered by HX-Trigger: closeModal)
+    document.body.addEventListener("closeModal", closeModalHandler);
+
+    // Escape key listener to dismiss modal
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeModalHandler();
+      }
+    });
+
     // Auto-close Bootstrap modals on successful HTMX submissions
     document.body.addEventListener("htmx:afterOnLoad", (event) => {
-      // If the response contains modal-close indicator header
       if (event.detail.xhr.getResponseHeader("HX-Trigger")?.includes("closeModal")) {
-        const modalContainer = document.getElementById("modal-container");
-        if (modalContainer) {
-          modalContainer.innerHTML = "";
-        }
-        const openModal = document.querySelector(".modal.show");
-        if (openModal) {
-          const modalInstance = bootstrap.Modal.getInstance(openModal);
-          if (modalInstance) {
-            modalInstance.hide();
-          }
-        }
+        closeModalHandler();
       }
     });
 
