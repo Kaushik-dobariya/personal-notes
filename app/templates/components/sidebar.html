@@ -5,9 +5,9 @@
     <div class="text-uppercase text-muted small fw-bold mb-2 ps-2" style="font-size: 0.75rem; letter-spacing: 0.5px;">Navigation</div>
     <ul class="nav nav-pills flex-column gap-1">
       <li class="nav-item">
-        <a href="/" class="sidebar-link {% if request.url.path == '/' or request.url.path == '/notes' %}active{% endif %}">
+        <a href="/" class="sidebar-link {% if (request.url.path == '/' or request.url.path == '/notes') and not current_category_id and not current_tag_id %}active{% endif %}">
           <i class="bi bi-journal-text me-2 fs-6"></i>
-          <span>My Notes</span>
+          <span>All Notes</span>
         </a>
       </li>
       <li class="nav-item">
@@ -23,6 +23,46 @@
         </a>
       </li>
     </ul>
+  </div>
+
+  <!-- Categories Section -->
+  <div class="mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-2 ps-2 pe-1">
+      <span class="text-uppercase text-muted small fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">Categories</span>
+      <button class="btn btn-sm btn-link p-0 text-muted" 
+              title="Add Category"
+              hx-get="/categories/modal"
+              hx-target="#modal-container"
+              hx-swap="innerHTML">
+        <i class="bi bi-plus-circle"></i>
+      </button>
+    </div>
+    <div id="sidebar-categories-list" 
+         {% if categories_with_counts is not defined or categories_with_counts is none %}hx-get="/categories/sidebar" hx-trigger="load" hx-swap="innerHTML"{% endif %}>
+      {% if categories_with_counts is defined and categories_with_counts is not none %}
+        {% include "partials/sidebar_categories.html" %}
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Tags Section -->
+  <div class="mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-2 ps-2 pe-1">
+      <span class="text-uppercase text-muted small fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">Tags</span>
+      <button class="btn btn-sm btn-link p-0 text-muted" 
+              title="Add Tag"
+              hx-get="/tags/modal"
+              hx-target="#modal-container"
+              hx-swap="innerHTML">
+        <i class="bi bi-plus-circle"></i>
+      </button>
+    </div>
+    <div id="sidebar-tags-list"
+         {% if all_tags is not defined or all_tags is none %}hx-get="/tags/sidebar" hx-trigger="load" hx-swap="innerHTML"{% endif %}>
+      {% if all_tags is defined and all_tags is not none %}
+        {% include "partials/sidebar_tags.html" %}
+      {% endif %}
+    </div>
   </div>
 
 </aside>

@@ -48,6 +48,10 @@
     document.body.addEventListener("htmx:afterOnLoad", (event) => {
       // If the response contains modal-close indicator header
       if (event.detail.xhr.getResponseHeader("HX-Trigger")?.includes("closeModal")) {
+        const modalContainer = document.getElementById("modal-container");
+        if (modalContainer) {
+          modalContainer.innerHTML = "";
+        }
         const openModal = document.querySelector(".modal.show");
         if (openModal) {
           const modalInstance = bootstrap.Modal.getInstance(openModal);

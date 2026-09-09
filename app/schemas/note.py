@@ -64,6 +64,7 @@ class NoteOut(BaseModel):
     user_id: int
     title: str
     content: str
+    category_id: Optional[int] = None
     is_deleted: bool
     deleted_at: Optional[datetime] = None
     created_at: datetime

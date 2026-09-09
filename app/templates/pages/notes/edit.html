@@ -49,6 +49,40 @@
             autofocus>
         </div>
 
+        <!-- Category and Tags Fields -->
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-6">
+            <label for="category_id" class="form-label fw-semibold">Category</label>
+            <select class="form-select" id="category_id" name="category_id">
+              <option value="">-- No Category --</option>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if note.category_id == cat.id %}selected{% endif %}>
+                {{ cat.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label for="tags" class="form-label fw-semibold">Tags</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="tags" 
+              name="tags" 
+              value="{{ note.tags | map(attribute='name') | join(', ') }}"
+              placeholder="e.g. work, python, urgent"
+              list="existing-tags-datalist"
+              autocomplete="off">
+            <datalist id="existing-tags-datalist">
+              {% for t in all_tags %}
+              <option value="{{ t.name }}">
+              {% endfor %}
+            </datalist>
+            <div class="form-text" style="font-size: 0.75rem;">Comma-separated, tags are automatically normalized.</div>
+          </div>
+        </div>
+
         <div class="mb-4">
           <label for="content" class="form-label fw-semibold">Content</label>
           <textarea 

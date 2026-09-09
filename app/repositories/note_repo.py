@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.note import Note
+from app.models.tag import Tag
 from app.repositories.base import BaseRepository
 
 
@@ -24,23 +25,39 @@ class NoteRepository(BaseRepository[Note]):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_active_by_user(self, user_id: int) -> List[Note]:
+    async def get_active_by_user(
+        self,
+        user_id: int,
+        category_id: Optional[int] = None,
+        tag_id: Optional[int] = None
+    ) -> List[Note]:
         """
-        List all active notes for the current user, ordered by recently updated.
-        Conceptual SQL: WHERE note.user_id = :user_id AND note.is_deleted IS FALSE ORDER BY note.updated_at DESC
+        List all active notes for the current user, optionally filtered by category or tag.
         """
         stmt = (
             select(Note)
             .where(Note.user_id == user_id, Note.is_deleted.is_(False))
-            .order_by(Note.updated_at.desc())
         )
+        if category_id is not None:
+            stmt = stmt.where(Note.category_id == category_id)
+        if tag_id is not None:
+            stmt = stmt.where(Note.tags.any(Tag.id == tag_id))
+
+        stmt = stmt.order_by(Note.updated_at.desc())
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    async def create(self, user_id: int, title: str, content: str = "") -> Note:
+    async def create(
+        self,
+        user_id: int,
+        title: str,
+        content: str = "",
+        category_id: Optional[int] = None
+    ) -> Note:
         """Create a new user-owned note."""
         note = Note(
             user_id=user_id,
+            category_id=category_id,
             title=title.strip(),
             content=content.strip() if content else "",
             is_deleted=False,
@@ -94,3 +111,33 @@ class NoteRepository(BaseRepository[Note]):
         await self.session.flush()
         await self.session.refresh(note)
         return note
+
+    async def assign_category(self, note: Note, category_id: Optional[int]) -> Note:
+        """Assign or remove category for a note."""
+        note.category_id = category_id
+        await self.session.flush()
+        await self.session.refresh(note, attribute_names=["category"])
+        return note
+
+    async def add_tag(self, note: Note, tag: Tag) -> Note:
+        """Add tag to note if not already attached."""
+        if tag.id not in [t.id for t in note.tags]:
+            note.tags.append(tag)
+            await self.session.flush()
+            await self.session.refresh(note, attribute_names=["tags"])
+        return note
+
+    async def remove_tag(self, note: Note, tag: Tag) -> Note:
+        """Remove tag from note."""
+        note.tags = [t for t in note.tags if t.id != tag.id]
+        await self.session.flush()
+        await self.session.refresh(note, attribute_names=["tags"])
+        return note
+
+    async def set_tags(self, note: Note, tags: List[Tag]) -> Note:
+        """Replace all tags on note with the provided tags list."""
+        note.tags = tags
+        await self.session.flush()
+        await self.session.refresh(note, attribute_names=["tags"])
+        return note
+

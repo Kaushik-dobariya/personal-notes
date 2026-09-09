@@ -17,7 +17,13 @@ class TagService:
         return await self.repo.get_by_id(tag_id, user_id)
 
     async def create_tag(self, user_id: int, name: str) -> Tag:
-        return await self.repo.get_or_create(name, user_id)
+        cleaned = name.strip().lstrip("#").lower()
+        if not cleaned:
+            raise ValueError("Tag name cannot be empty.")
+        existing = await self.repo.get_by_name(cleaned, user_id)
+        if existing:
+            raise ValueError(f"Tag '#{cleaned}' already exists.")
+        return await self.repo.create(user_id, cleaned)
 
     async def rename_tag(self, user_id: int, tag_id: int, new_name: str) -> Tag:
         tag = await self.repo.get_by_id(tag_id, user_id)
@@ -25,6 +31,9 @@ class TagService:
             raise ValueError("Tag not found.")
 
         cleaned = new_name.strip().lstrip("#").lower()
+        if not cleaned:
+            raise ValueError("Tag name cannot be empty.")
+
         existing = await self.repo.get_by_name(cleaned, user_id)
         if existing and existing.id != tag.id:
             raise ValueError(f"Tag '#{cleaned}' already exists.")

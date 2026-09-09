@@ -1,0 +1,31 @@
+<div id="note-category-{{ note.id }}" class="note-category-container mb-2">
+  <form class="d-inline-flex align-items-center flex-wrap gap-1"
+        hx-patch="/notes/{{ note.id }}/category"
+        hx-target="#note-category-{{ note.id }}"
+        hx-swap="outerHTML">
+    <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">Category:</span>
+    <select name="category_id" 
+            class="form-select form-select-sm py-0 px-2" 
+            style="font-size: 0.75rem; width: auto; min-width: 120px;"
+            onchange="this.form.requestSubmit()">
+      <option value="" {% if not note.category_id %}selected{% endif %}>None</option>
+      {% for cat in all_categories %}
+      <option value="{{ cat.id }}" {% if note.category_id == cat.id %}selected{% endif %}>
+        {{ cat.name }}
+      </option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-sm btn-primary py-0 px-2" style="font-size: 0.725rem;">
+      Save
+    </button>
+    <button type="button" 
+            class="btn btn-sm btn-outline-secondary py-0 px-1" 
+            style="font-size: 0.725rem;"
+            title="Cancel"
+            hx-get="/notes/{{ note.id }}/category"
+            hx-target="#note-category-{{ note.id }}"
+            hx-swap="outerHTML">
+      <i class="bi bi-x"></i>
+    </button>
+  </form>
+</div>

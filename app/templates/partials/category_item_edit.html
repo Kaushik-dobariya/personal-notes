@@ -1,0 +1,24 @@
+<li class="nav-item p-1 mb-1 rounded bg-body-tertiary border" id="category-item-{{ category.id }}">
+  <form class="d-flex align-items-center gap-1"
+        hx-put="/categories/{{ category.id }}"
+        hx-target="#category-item-{{ category.id }}"
+        hx-swap="outerHTML">
+    <input type="text" 
+           name="name" 
+           value="{{ category.name }}" 
+           class="form-control form-control-sm py-0 px-2" 
+           style="font-size: 0.8rem;" 
+           required 
+           autofocus>
+    <button type="submit" class="btn btn-sm btn-primary py-0 px-2" style="font-size: 0.75rem;">Save</button>
+    <button type="button" 
+            class="btn btn-sm btn-outline-secondary py-0 px-1" 
+            style="font-size: 0.75rem;"
+            hx-get="/categories/{{ category.id }}/inline-view" 
+            hx-target="#category-item-{{ category.id }}" 
+            hx-swap="outerHTML"
+            title="Cancel">
+      <i class="bi bi-x"></i>
+    </button>
+  </form>
+</li>

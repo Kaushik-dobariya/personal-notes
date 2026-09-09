@@ -75,5 +75,11 @@ class CategoryRepository(BaseRepository[Category]):
         return category
 
     async def delete(self, category: Category) -> None:
+        from sqlalchemy import update
+        await self.session.execute(
+            update(Note)
+            .where(Note.category_id == category.id, Note.user_id == category.user_id)
+            .values(category_id=None)
+        )
         await self.session.delete(category)
         await self.session.flush()

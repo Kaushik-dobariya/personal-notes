@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}{{ note.title }} - Personal Notes{% endblock %}
+{% block title %}View Note - {{ note.title }} - Personal Notes{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-0" style="max-width: 860px; margin: 0 auto;">
@@ -29,7 +29,7 @@
   <div class="card shadow-sm border" style="border-color: var(--card-border) !important; background-color: var(--card-bg);">
     <div class="card-header bg-transparent py-3 border-bottom" style="border-color: var(--card-border) !important;">
       <h1 class="h3 fw-bold mb-2 text-break">{{ note.title }}</h1>
-      <div class="d-flex flex-wrap align-items-center gap-3 text-muted small">
+      <div class="d-flex flex-wrap align-items-center gap-3 text-muted small mb-2">
         <span title="Created at">
           <i class="bi bi-calendar-plus me-1 text-primary"></i> 
           Created: {{ note.created_at.strftime('%b %d, %Y at %I:%M %p') }}
@@ -38,6 +38,22 @@
           <i class="bi bi-clock-history me-1 text-info"></i> 
           Updated: {{ note.updated_at.strftime('%b %d, %Y at %I:%M %p') }}
         </span>
+      </div>
+
+      <!-- Category and Tags Badges -->
+      <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+        {% if note.category %}
+        <span class="badge rounded-pill border d-inline-flex align-items-center px-2 py-1" 
+              style="background-color: {{ note.category.color }}18; color: {{ note.category.color }}; border-color: {{ note.category.color }}50 !important; font-size: 0.8rem;">
+          <span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background-color: {{ note.category.color }};"></span>
+          {{ note.category.name }}
+        </span>
+        {% endif %}
+        {% for tag in note.tags %}
+        <span class="badge bg-secondary-subtle text-secondary-emphasis border rounded-pill px-2 py-1" style="font-size: 0.8rem;">
+          #{{ tag.name }}
+        </span>
+        {% endfor %}
       </div>
     </div>
 

@@ -1,0 +1,27 @@
+<div id="note-category-{{ note.id }}" class="note-category-container mb-2">
+  <div class="d-flex align-items-center flex-wrap gap-1">
+    <span class="text-muted small fw-semibold" style="font-size: 0.75rem;">Category:</span>
+    {% if note.category %}
+      <button class="btn btn-sm btn-light border py-0 px-2 rounded-pill d-inline-flex align-items-center"
+              style="font-size: 0.75rem;"
+              title="Click to change category"
+              hx-get="/notes/{{ note.id }}/category/edit"
+              hx-target="#note-category-{{ note.id }}"
+              hx-swap="outerHTML">
+        <span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background-color: {{ note.category.color }};"></span>
+        <span class="fw-medium">{{ note.category.name }}</span>
+        <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 0.65rem;"></i>
+      </button>
+    {% else %}
+      <button class="btn btn-sm btn-outline-secondary border-dashed py-0 px-2 rounded-pill d-inline-flex align-items-center"
+              style="font-size: 0.75rem; border-style: dashed;"
+              title="Click to assign category"
+              hx-get="/notes/{{ note.id }}/category/edit"
+              hx-target="#note-category-{{ note.id }}"
+              hx-swap="outerHTML">
+        <span class="text-muted fst-italic">None</span>
+        <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 0.65rem;"></i>
+      </button>
+    {% endif %}
+  </div>
+</div>

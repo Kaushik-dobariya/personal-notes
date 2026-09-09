@@ -38,7 +38,9 @@ class Note(Base, TimestampMixin):
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="notes")
-    category: Mapped[Optional["Category"]] = relationship("Category", back_populates="notes")
+    category: Mapped[Optional["Category"]] = relationship(
+        "Category", back_populates="notes", lazy="selectin"
+    )
     tags: Mapped[List["Tag"]] = relationship(
         "Tag", secondary="note_tags", back_populates="notes", lazy="selectin"
     )

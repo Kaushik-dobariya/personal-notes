@@ -16,11 +16,32 @@
     </div>
 
     <div>
-      <a href="/notes/new" class="btn btn-primary rounded-pill px-3 d-flex align-items-center shadow-sm">
+      <a href="/notes/new{% if current_category_id %}?category_id={{ current_category_id }}{% endif %}" class="btn btn-primary rounded-pill px-3 d-flex align-items-center shadow-sm">
         <i class="bi bi-plus-lg me-1"></i> New Note
       </a>
     </div>
   </div>
+
+  <!-- Active Filter Banner -->
+  {% if selected_category or selected_tag %}
+  <div class="d-flex align-items-center flex-wrap gap-2 mb-4 p-2 px-3 rounded bg-body-secondary border" style="font-size: 0.85rem;">
+    <span class="text-muted fw-semibold"><i class="bi bi-funnel-fill me-1"></i> Filter active:</span>
+    {% if selected_category %}
+      <span class="badge rounded-pill border d-inline-flex align-items-center px-2 py-1" style="background-color: {{ selected_category.color }}20; color: {{ selected_category.color }}; border-color: {{ selected_category.color }}50 !important;">
+        <span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background-color: {{ selected_category.color }};"></span>
+        Category: {{ selected_category.name }}
+      </span>
+    {% endif %}
+    {% if selected_tag %}
+      <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+        Tag: #{{ selected_tag.name }}
+      </span>
+    {% endif %}
+    <a href="/" class="btn btn-sm btn-link text-decoration-none ms-auto p-0 small">
+      <i class="bi bi-x-circle me-1"></i>Clear Filter
+    </a>
+  </div>
+  {% endif %}
 
   <!-- Notes Section -->
   {% if notes %}
@@ -30,11 +51,17 @@
         <div class="card note-card h-100 shadow-sm" id="note-card-{{ note.id }}">
           <div class="card-body d-flex flex-column">
             
+            <!-- Category Assignment / Selector -->
+            {% include "partials/note_category.html" %}
+
             <!-- Inline Editable Title -->
             {% include "partials/note_title.html" %}
 
             <!-- Inline Editable & Appendable Content -->
             {% include "partials/note_content.html" %}
+
+            <!-- Tags -->
+            {% include "partials/note_tags.html" %}
 
             <!-- Timestamps -->
             <div class="border-top pt-2 mt-auto mb-3 text-muted" style="font-size: 0.78rem; border-color: var(--card-border) !important;">
@@ -77,13 +104,32 @@
         <div class="display-5 text-muted mb-3">
           <i class="bi bi-journal-plus text-primary opacity-75"></i>
         </div>
-        <h2 class="h4 fw-bold mb-2">No notes yet</h2>
+        <h2 class="h4 fw-bold mb-2">
+          {% if selected_category %}
+            No notes in category "{{ selected_category.name }}"
+          {% elif selected_tag %}
+            No notes tagged "#{{ selected_tag.name }}"
+          {% else %}
+            No notes yet
+          {% endif %}
+        </h2>
         <p class="text-muted small mb-4" style="max-width: 420px; margin: 0 auto;">
-          You haven't created any notes yet. Click the button below to create your first note.
+          {% if selected_category or selected_tag %}
+            Try clearing the filter or creating a new note with this category/tag.
+          {% else %}
+            You haven't created any notes yet. Click the button below to create your first note.
+          {% endif %}
         </p>
-        <a href="/notes/new" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
-          <i class="bi bi-plus-lg me-1"></i> Create Your First Note
-        </a>
+        <div class="d-flex align-items-center justify-content-center gap-2">
+          {% if selected_category or selected_tag %}
+            <a href="/" class="btn btn-outline-secondary rounded-pill px-3">
+              Clear Filter
+            </a>
+          {% endif %}
+          <a href="/notes/new{% if current_category_id %}?category_id={{ current_category_id }}{% endif %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Create Note
+          </a>
+        </div>
       </div>
     </div>
   {% endif %}

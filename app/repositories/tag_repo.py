@@ -37,6 +37,14 @@ class TagRepository(BaseRepository[Tag]):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def create(self, user_id: int, name: str) -> Tag:
+        cleaned = name.strip().lstrip("#").lower()
+        tag = Tag(user_id=user_id, name=cleaned)
+        self.session.add(tag)
+        await self.session.flush()
+        await self.session.refresh(tag)
+        return tag
+
     async def get_or_create(self, name: str, user_id: int) -> Tag:
         cleaned = name.strip().lstrip("#").lower()
         existing = await self.get_by_name(cleaned, user_id)
@@ -56,5 +64,10 @@ class TagRepository(BaseRepository[Tag]):
         return tag
 
     async def delete(self, tag: Tag) -> None:
+        from sqlalchemy import delete as sql_delete
+        from app.models.note_tag import NoteTag
+        await self.session.execute(
+            sql_delete(NoteTag).where(NoteTag.tag_id == tag.id)
+        )
         await self.session.delete(tag)
         await self.session.flush()

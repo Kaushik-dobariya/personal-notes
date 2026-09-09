@@ -1,0 +1,35 @@
+<li class="nav-item d-flex align-items-center justify-content-between rounded pe-2 category-item {% if current_category_id == category.id %}bg-primary-subtle{% endif %}" id="category-item-{{ category.id }}">
+  <a href="/?category_id={{ category.id }}" class="sidebar-link py-1 px-2 flex-grow-1 text-truncate {% if current_category_id == category.id %}text-primary fw-semibold{% endif %}">
+    <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px; background-color: {{ category.color }};"></span>
+    <span class="text-truncate">{{ category.name }}</span>
+  </a>
+  <div class="d-flex align-items-center gap-1">
+    {% if count is defined and count is not none %}
+    <span class="badge rounded-pill bg-body-secondary text-muted" style="font-size: 0.7rem;">{{ count }}</span>
+    {% endif %}
+    <div class="dropdown">
+      <button class="btn btn-link btn-sm p-0 text-muted" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
+        <i class="bi bi-three-dots-vertical" style="font-size: 0.75rem;"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end py-1 shadow-sm border-0" style="font-size: 0.8rem;">
+        <li>
+          <button class="dropdown-item py-1" 
+                  hx-get="/categories/{{ category.id }}/inline-edit" 
+                  hx-target="#category-item-{{ category.id }}"
+                  hx-swap="outerHTML">
+            <i class="bi bi-pencil me-1"></i> Rename
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item py-1 text-danger" 
+                  hx-delete="/categories/{{ category.id }}" 
+                  hx-confirm="Are you sure you want to delete category '{{ category.name }}'? Notes in this category will become unassigned."
+                  hx-target="#category-item-{{ category.id }}"
+                  hx-swap="outerHTML">
+            <i class="bi bi-trash me-1"></i> Delete
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</li>
