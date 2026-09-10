@@ -1,0 +1,319 @@
+/* ==========================================================================
+   Components (Note Cards, Badges, Modals, Toasts, Loading Indicators, Empty States)
+   ========================================================================== */
+
+/* Note Cards */
+.note-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0.85rem;
+  transition: transform var(--transition-speed) ease, 
+              box-shadow var(--transition-speed) ease, 
+              border-color var(--transition-speed) ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.note-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--card-border-hover);
+}
+
+/* Pinned Note Card */
+.note-card.is-pinned {
+  border-color: var(--pinned-border);
+  background: linear-gradient(180deg, var(--pinned-bg) 0%, var(--card-bg) 40%);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+}
+
+.pinned-badge-indicator {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  background-color: var(--pinned-badge);
+  color: var(--pinned-text);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+/* Archived Note Card */
+.note-card.is-archived {
+  background-color: var(--archived-bg);
+  border: 1px dashed var(--archived-border);
+  opacity: 0.94;
+}
+
+/* Editable Title */
+.editable-title {
+  cursor: pointer;
+  border-radius: 0.35rem;
+  padding: 0.15rem 0.35rem;
+  margin-left: -0.35rem;
+  transition: background-color var(--transition-speed) ease;
+  color: var(--text-primary);
+}
+
+.editable-title:hover {
+  background-color: var(--accent-subtle);
+}
+
+.editable-title .edit-hint {
+  opacity: 0;
+  transition: opacity var(--transition-speed) ease;
+}
+
+.editable-title:hover .edit-hint {
+  opacity: 0.6;
+}
+
+/* Editable Content */
+.editable-content {
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+}
+
+.editable-content:hover {
+  background-color: var(--accent-subtle);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* Quick Actions in Card Footer */
+.quick-action-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  border-radius: 9999px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  padding: 0;
+  transition: all var(--transition-speed) ease;
+  cursor: pointer;
+}
+
+.quick-action-btn:hover {
+  background-color: var(--accent-subtle);
+  color: var(--accent-color);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.quick-action-btn.active-favorite,
+.quick-action-btn:hover.active-favorite {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.quick-action-btn.active-pin,
+.quick-action-btn:hover.active-pin {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.quick-action-btn.active-archive,
+.quick-action-btn:hover.active-archive {
+  color: #0284c7;
+  background-color: rgba(2, 132, 199, 0.1);
+  border-color: rgba(2, 132, 199, 0.2);
+}
+
+.quick-action-btn.text-danger-hover:hover {
+  color: #ef4444 !important;
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+/* HTMX Loading States */
+#htmx-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+  z-index: 9999;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#htmx-progress-bar.htmx-loading {
+  opacity: 1;
+  transform: translateX(0);
+  animation: pulse-progress 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-progress {
+  0% { opacity: 0.7; transform: translateX(-40%); }
+  50% { opacity: 1; transform: translateX(0%); }
+  100% { opacity: 0.7; transform: translateX(40%); }
+}
+
+.htmx-indicator {
+  display: none !important;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-indicator.htmx-request {
+  display: inline-block !important;
+}
+
+/* Dim card/content while saving */
+.htmx-request.note-card,
+.htmx-request#note-grid {
+  opacity: 0.65;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+/* Toast Notifications */
+.toast-container {
+  z-index: 1080;
+}
+
+.app-toast {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+  min-width: 280px;
+  max-width: 380px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: toast-slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.app-toast.toast-hiding {
+  animation: toast-fade-out 0.25s ease forwards;
+}
+
+@keyframes toast-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+.toast-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.toast-icon.toast-success {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.toast-icon.toast-info {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.toast-icon.toast-warning {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.toast-icon.toast-danger {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Empty States */
+.empty-state-card {
+  border: 2px dashed var(--card-border);
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-state-icon-wrapper {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.25rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Active Filter Chips & Bar */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0.75rem;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* Modal Dialog Polish */
+.modal-content {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 1rem !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--card-border) !important;
+}

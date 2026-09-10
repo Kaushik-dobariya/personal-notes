@@ -1,25 +1,61 @@
-<aside class="sidebar p-3 d-flex flex-column" id="sidebar-menu">
+<aside class="sidebar d-flex flex-column" id="sidebar-menu" aria-label="Sidebar Navigation">
   
+  <!-- Mobile Header (Close Drawer Button) -->
+  <div class="d-flex d-lg-none align-items-center justify-content-between pb-3 mb-3 border-bottom" style="border-color: var(--card-border) !important;">
+    <div class="d-flex align-items-center fw-bold text-primary">
+      <i class="bi bi-journal-bookmark-fill me-2 fs-5"></i>
+      <span>Personal Notes</span>
+    </div>
+    <button type="button" class="btn-close" aria-label="Close sidebar" onclick="window.closeMobileSidebar()"></button>
+  </div>
+
   <!-- Main Navigation Links -->
   <div class="mb-4">
-    <div class="text-uppercase text-muted small fw-bold mb-2 ps-2" style="font-size: 0.75rem; letter-spacing: 0.5px;">Navigation</div>
-    <ul class="nav nav-pills flex-column gap-1">
+    <div class="sidebar-heading">Navigation</div>
+    <ul class="sidebar-nav">
       <li class="nav-item">
-        <a href="/" class="sidebar-link {% if (request.url.path == '/' or request.url.path == '/notes') and not current_category_id and not current_tag_id %}active{% endif %}">
-          <i class="bi bi-journal-text me-2 fs-6"></i>
+        <a href="/" class="sidebar-link {% if (request.url.path == '/' or request.url.path == '/notes') and not current_filter and not current_category_id and not current_tag_id %}active{% endif %}" onclick="window.closeMobileSidebar()">
+          <i class="bi bi-journal-text"></i>
           <span>All Notes</span>
+          <span class="badge rounded-pill ms-auto {% if not current_filter and not current_category_id and not current_tag_id %}bg-white text-primary{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}" id="sidebar-all-count">
+            {% if note_counts is defined and note_counts %}{{ note_counts.all }}{% endif %}
+          </span>
         </a>
       </li>
       <li class="nav-item">
-        <a href="/notes/new" class="sidebar-link {% if request.url.path == '/notes/new' %}active{% endif %}">
-          <i class="bi bi-plus-circle me-2 fs-6 text-primary"></i>
-          <span>Create Note</span>
+        <a href="/favorites" class="sidebar-link {% if current_filter == 'favorites' or request.url.path == '/favorites' %}active{% endif %}" onclick="window.closeMobileSidebar()">
+          <i class="bi bi-star-fill text-warning"></i>
+          <span>Favorites</span>
+          <span class="badge rounded-pill ms-auto {% if current_filter == 'favorites' or request.url.path == '/favorites' %}bg-white text-primary{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}" id="sidebar-favorites-count">
+            {% if note_counts is defined and note_counts %}{{ note_counts.favorites }}{% endif %}
+          </span>
         </a>
       </li>
       <li class="nav-item">
-        <a href="/profile" class="sidebar-link {% if '/profile' in request.url.path %}active{% endif %}">
-          <i class="bi bi-person-gear me-2 fs-6"></i>
-          <span>Account Settings</span>
+        <a href="/pinned" class="sidebar-link {% if current_filter == 'pinned' or request.url.path == '/pinned' %}active{% endif %}" onclick="window.closeMobileSidebar()">
+          <i class="bi bi-pin-angle-fill text-warning"></i>
+          <span>Pinned</span>
+          <span class="badge rounded-pill ms-auto {% if current_filter == 'pinned' or request.url.path == '/pinned' %}bg-white text-primary{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}" id="sidebar-pinned-count">
+            {% if note_counts is defined and note_counts %}{{ note_counts.pinned }}{% endif %}
+          </span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/archive" class="sidebar-link {% if current_filter == 'archive' or request.url.path == '/archive' %}active{% endif %}" onclick="window.closeMobileSidebar()">
+          <i class="bi bi-archive-fill text-info"></i>
+          <span>Archive</span>
+          <span class="badge rounded-pill ms-auto {% if current_filter == 'archive' or request.url.path == '/archive' %}bg-white text-primary{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}" id="sidebar-archive-count">
+            {% if note_counts is defined and note_counts %}{{ note_counts.archived }}{% endif %}
+          </span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/trash" class="sidebar-link {% if current_filter == 'trash' or request.url.path == '/trash' %}active{% endif %}" onclick="window.closeMobileSidebar()">
+          <i class="bi bi-trash3-fill text-danger"></i>
+          <span>Trash</span>
+          <span class="badge rounded-pill ms-auto {% if current_filter == 'trash' or request.url.path == '/trash' %}bg-white text-primary{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}" id="sidebar-trash-count">
+            {% if note_counts is defined and note_counts %}{{ note_counts.trash }}{% endif %}
+          </span>
         </a>
       </li>
     </ul>
@@ -27,14 +63,15 @@
 
   <!-- Categories Section -->
   <div class="mb-4">
-    <div class="d-flex align-items-center justify-content-between mb-2 ps-2 pe-1">
-      <span class="text-uppercase text-muted small fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">Categories</span>
+    <div class="sidebar-heading">
+      <span>Categories</span>
       <button class="btn btn-sm btn-link p-0 text-muted" 
               title="Add Category"
+              aria-label="Add New Category"
               hx-get="/categories/modal"
               hx-target="#modal-container"
               hx-swap="innerHTML">
-        <i class="bi bi-plus-circle"></i>
+        <i class="bi bi-plus-circle-fill fs-6 text-primary"></i>
       </button>
     </div>
     <div id="sidebar-categories-list" 
@@ -47,14 +84,15 @@
 
   <!-- Tags Section -->
   <div class="mb-4">
-    <div class="d-flex align-items-center justify-content-between mb-2 ps-2 pe-1">
-      <span class="text-uppercase text-muted small fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">Tags</span>
+    <div class="sidebar-heading">
+      <span>Tags</span>
       <button class="btn btn-sm btn-link p-0 text-muted" 
               title="Add Tag"
+              aria-label="Add New Tag"
               hx-get="/tags/modal"
               hx-target="#modal-container"
               hx-swap="innerHTML">
-        <i class="bi bi-plus-circle"></i>
+        <i class="bi bi-plus-circle-fill fs-6 text-primary"></i>
       </button>
     </div>
     <div id="sidebar-tags-list"
@@ -63,6 +101,14 @@
         {% include "partials/sidebar_tags.html" %}
       {% endif %}
     </div>
+  </div>
+
+  <!-- Bottom Account Link -->
+  <div class="mt-auto pt-3 border-top" style="border-color: var(--card-border) !important;">
+    <a href="/profile" class="sidebar-link {% if '/profile' in request.url.path %}active{% endif %}" onclick="window.closeMobileSidebar()">
+      <i class="bi bi-person-gear"></i>
+      <span>Settings</span>
+    </a>
   </div>
 
 </aside>

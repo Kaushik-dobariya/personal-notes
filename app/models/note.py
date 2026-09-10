@@ -45,5 +45,12 @@ class Note(Base, TimestampMixin):
         "Tag", secondary="note_tags", back_populates="notes", lazy="selectin"
     )
 
+    @property
+    def formatted_deleted_at(self) -> str:
+        if not self.deleted_at:
+            return ""
+        hour = self.deleted_at.strftime("%I").lstrip("0") or "0"
+        return f"{self.deleted_at.strftime('%d %b %Y')}, {hour}:{self.deleted_at.strftime('%M %p')}"
+
     def __repr__(self) -> str:
         return f"<Note id={self.id} title={self.title[:20]!r} user_id={self.user_id}>"

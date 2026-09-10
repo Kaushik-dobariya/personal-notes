@@ -17,13 +17,16 @@ templates = Jinja2Templates(directory="app/templates")
 @router.get("", response_class=HTMLResponse)
 async def profile_page(
     request: Request,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
 ):
     """View user profile."""
+    from app.services.note_service import NoteService
+    note_counts = await NoteService(db).get_user_note_counts(current_user.id)
     return templates.TemplateResponse(
         request=request,
         name="pages/profile/index.html",
-        context={"current_user": current_user}
+        context={"current_user": current_user, "note_counts": note_counts}
     )
 
 

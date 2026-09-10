@@ -1,55 +1,148 @@
-<nav class="navbar navbar-expand-lg border-bottom px-3 py-2 sticky-top" style="background-color: var(--sidebar-bg); border-color: var(--card-border) !important; z-index: 1030;">
-  <div class="container-fluid px-0">
+<nav class="top-toolbar px-3" aria-label="Main Toolbar">
+  <div class="container-fluid px-0 d-flex align-items-center justify-content-between">
     
-    <!-- Brand -->
-    <a class="navbar-brand d-flex align-items-center fw-bold fs-5 text-primary me-4" href="/">
-      <i class="bi bi-journal-bookmark-fill me-2 fs-4"></i>
-      Personal Notes
-    </a>
-
-    <!-- Mobile Sidebar Toggle -->
-    <button class="btn btn-outline-secondary d-lg-none btn-sm me-2" type="button" onclick="document.getElementById('sidebar-menu').classList.toggle('show')">
-      <i class="bi bi-list fs-5"></i>
-    </button>
-
-    <!-- Right Controls -->
-    <div class="d-flex align-items-center ms-auto gap-2">
-      <!-- Create Note Button -->
-      <a href="/notes/new" class="btn btn-primary btn-sm rounded-pill px-3 d-flex align-items-center shadow-sm">
-        <i class="bi bi-plus-lg me-1"></i>
-        <span>New Note</span>
-      </a>
-
-      <!-- Theme Switcher -->
-      <button class="btn btn-outline-secondary btn-sm rounded-circle p-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" id="theme-toggle" type="button" title="Toggle Theme">
-        <i class="bi bi-sun-fill text-warning" id="theme-icon"></i>
+    <!-- Left Section: Mobile Menu Toggle & Brand -->
+    <div class="d-flex align-items-center me-3">
+      <!-- Mobile Sidebar Toggle -->
+      <button class="btn btn-sm btn-outline-secondary d-lg-none me-2 rounded-circle p-1 d-flex align-items-center justify-content-center"
+              style="width: 36px; height: 36px;"
+              type="button" 
+              onclick="window.toggleMobileSidebar()"
+              aria-label="Toggle navigation menu"
+              title="Toggle sidebar">
+        <i class="bi bi-list fs-5"></i>
       </button>
 
-      <!-- User Dropdown Menu -->
+      <!-- Brand Logo -->
+      <a class="toolbar-brand" href="/" aria-label="Personal Notes Home">
+        <span class="brand-icon">
+          <i class="bi bi-journal-bookmark-fill"></i>
+        </span>
+        <span class="d-none d-sm-inline">Personal Notes</span>
+      </a>
+    </div>
+
+    <!-- Center Section: Live Search Bar (Visible on Tablet & Desktop) -->
+    <div class="flex-grow-1 d-flex justify-content-center px-2">
+      <form action="/" method="GET" class="search-input-wrapper m-0" onsubmit="if(!document.getElementById('notes-grid')){ return true; } event.preventDefault(); return false;">
+        <i class="bi bi-search search-icon" aria-hidden="true"></i>
+        <input type="search"
+               name="search"
+               id="global-search-input"
+               class="form-control form-control-sm search-input"
+               placeholder="Search notes, tags, contents... (/) "
+               value="{{ search_query or '' }}"
+               aria-label="Search notes"
+               hx-get="/"
+               hx-trigger="input changed delay:300ms, search"
+               hx-target="#notes-grid"
+               hx-swap="outerHTML"
+               hx-push-url="true"
+               hx-include="#current-filter-input, #current-category-input, #current-tag-input"
+               oninput="const btn = document.getElementById('search-clear-btn'); if(btn) btn.style.display = this.value ? 'inline-block' : 'none';"
+               onkeydown="if(event.key==='Escape'){ this.value=''; const btn = document.getElementById('search-clear-btn'); if(btn) btn.style.display='none'; htmx.trigger(this, 'search'); }">
+        <button type="button" 
+                class="search-clear-btn" 
+                id="search-clear-btn" 
+                aria-label="Clear search"
+                title="Clear search"
+                onclick="const input=document.getElementById('global-search-input'); input.value=''; this.style.display='none'; htmx.trigger(input, 'search');"
+                style="display: {% if search_query %}inline-block{% else %}none{% endif %};">
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Right Controls: Create Note, Theme, Profile -->
+    <div class="d-flex align-items-center ms-2 gap-2 flex-shrink-0">
+      
+      <!-- Quick Create Note Button -->
+      <button type="button"
+              class="btn btn-primary btn-sm rounded-pill px-3 d-flex align-items-center shadow-sm"
+              hx-get="/notes/create-modal"
+              hx-target="#modal-container"
+              hx-swap="innerHTML"
+              aria-label="Create New Note"
+              title="Create a new note">
+        <i class="bi bi-plus-lg me-1"></i>
+        <span class="d-none d-md-inline fw-semibold">New Note</span>
+      </button>
+
+      <!-- Theme Switcher Dropdown (Light / Dark / Auto) -->
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary btn-sm rounded-circle p-1 d-flex align-items-center justify-content-center"
+                style="width: 36px; height: 36px;"
+                id="theme-dropdown-btn"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Select Theme Mode"
+                title="Toggle Theme">
+          <i class="bi bi-sun-fill text-warning" id="theme-icon"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="min-width: 150px; font-size: 0.85rem;">
+          <li><h6 class="dropdown-header py-1 text-muted small fw-bold">Appearance</h6></li>
+          <li>
+            <button class="dropdown-item py-1 d-flex align-items-center gap-2" type="button" onclick="window.setAppTheme('light')">
+              <i class="bi bi-sun-fill text-warning"></i>
+              <span>Light</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item py-1 d-flex align-items-center gap-2" type="button" onclick="window.setAppTheme('dark')">
+              <i class="bi bi-moon-stars-fill text-warning"></i>
+              <span>Dark</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item py-1 d-flex align-items-center gap-2" type="button" onclick="window.setAppTheme('auto')">
+              <i class="bi bi-circle-half text-primary"></i>
+              <span>System</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- User Profile Dropdown Menu -->
       {% if current_user %}
       <div class="dropdown">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle rounded-pill px-3 d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-person-circle me-1 text-primary"></i>
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle rounded-pill px-2 py-1 d-flex align-items-center gap-1"
+                type="button" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                aria-label="User profile menu">
+          <span class="badge rounded-circle bg-primary text-white p-1 d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.75rem;">
+            {{ current_user.full_name[0]|upper }}
+          </span>
           <span class="small fw-semibold d-none d-md-inline">{{ current_user.full_name.split()[0] }}</span>
         </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="min-width: 200px;">
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="min-width: 220px; font-size: 0.875rem;">
           <li class="px-3 py-2 border-bottom">
             <div class="fw-bold small text-truncate">{{ current_user.full_name }}</div>
             <div class="text-muted small text-truncate">{{ current_user.email }}</div>
           </li>
-          <li><a class="dropdown-item small py-2" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
-          <li><a class="dropdown-item small py-2" href="/profile#change-password"><i class="bi bi-key me-2"></i>Change Password</a></li>
+          <li>
+            <a class="dropdown-item small py-2 d-flex align-items-center gap-2" href="/profile">
+              <i class="bi bi-person text-muted"></i>Profile
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item small py-2 d-flex align-items-center gap-2" href="/profile#change-password">
+              <i class="bi bi-key text-muted"></i>Change Password
+            </a>
+          </li>
           <li><hr class="dropdown-divider my-1"></li>
           <li>
             <form method="POST" action="/auth/logout" class="d-inline w-100">
-              <button type="submit" class="dropdown-item small py-2 text-danger">
-                <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+              <button type="submit" class="dropdown-item small py-2 text-danger d-flex align-items-center gap-2">
+                <i class="bi bi-box-arrow-right"></i>Sign Out
               </button>
             </form>
           </li>
         </ul>
       </div>
       {% endif %}
+
     </div>
 
   </div>

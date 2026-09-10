@@ -1,0 +1,16 @@
+{% if not note.is_archived %}
+<div id="note-pin-action-{{ note.id }}" class="d-inline-block">
+  <button type="button"
+          class="btn btn-sm {% if note.is_pinned %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-2 py-1 d-inline-flex align-items-center gap-1 pin-btn"
+          title="{{ 'Unpin note' if note.is_pinned else 'Pin note to top' }}"
+          hx-post="/notes/{{ note.id }}/toggle-pin"
+          hx-target="#note-pin-action-{{ note.id }}"
+          hx-swap="outerHTML">
+    <span class="pin-icon">📌</span>
+    <span class="pin-label small">{{ 'Pinned' if note.is_pinned else 'Pin' }}</span>
+  </button>
+</div>
+{% if request.headers.get('HX-Request') == 'true' and note_counts is defined and note_counts %}
+<span id="sidebar-pinned-count" hx-swap-oob="innerHTML">{{ note_counts.pinned }}</span>
+{% endif %}
+{% endif %}

@@ -6,6 +6,9 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 class NoteCreate(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     content: str = Field(default="")
+    is_favorite: Optional[bool] = False
+    is_pinned: Optional[bool] = False
+    is_archived: Optional[bool] = False
 
     @field_validator("title")
     @classmethod
@@ -19,6 +22,9 @@ class NoteCreate(BaseModel):
 class NoteUpdate(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     content: str = Field(default="")
+    is_favorite: Optional[bool] = None
+    is_pinned: Optional[bool] = None
+    is_archived: Optional[bool] = None
 
     @field_validator("title")
     @classmethod
@@ -65,6 +71,9 @@ class NoteOut(BaseModel):
     title: str
     content: str
     category_id: Optional[int] = None
+    is_favorite: bool = False
+    is_pinned: bool = False
+    is_archived: bool = False
     is_deleted: bool
     deleted_at: Optional[datetime] = None
     created_at: datetime

@@ -1,64 +1,94 @@
-<div class="row g-3" id="notes-grid">
+{% if notes %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="notes-grid">
   {% for note in notes %}
-    {% include "partials/note_card.html" %}
-  {% else %}
-    <div class="col-12 py-5 text-center">
-      <div class="py-5">
-        <div class="d-inline-flex align-items-center justify-content-center bg-body-secondary text-muted rounded-circle p-4 mb-3" style="width: 72px; height: 72px;">
-          {% if current_status == 'trash' %}
-            <i class="bi bi-trash3 fs-2"></i>
-          {% elif current_status == 'favorites' %}
-            <i class="bi bi-heart fs-2"></i>
-          {% elif current_status == 'pinned' %}
-            <i class="bi bi-pin-angle fs-2"></i>
-          {% elif current_status == 'archived' %}
-            <i class="bi bi-archive fs-2"></i>
-          {% else %}
-            <i class="bi bi-journal-plus fs-2"></i>
-          {% endif %}
-        </div>
-        
-        <h3 class="h5 fw-bold mb-1">
-          {% if current_status == 'trash' %}
-            Trash is Empty
-          {% elif current_status == 'favorites' %}
-            No Favorite Notes
-          {% elif current_status == 'pinned' %}
-            No Pinned Notes
-          {% elif current_status == 'archived' %}
-            No Archived Notes
-          {% elif query %}
-            No notes matching "{{ query }}"
-          {% else %}
-            No Notes Yet
-          {% endif %}
-        </h3>
-        
-        <p class="text-muted small mb-3">
-          {% if current_status == 'trash' %}
-            Deleted notes will appear here before being permanently removed.
-          {% elif current_status == 'favorites' %}
-            Click the heart icon on any note to add it to your favorites.
-          {% elif current_status == 'pinned' %}
-            Click the pin icon on any note to keep it pinned at the top.
-          {% elif current_status == 'archived' %}
-            Archive notes you want to keep organized without cluttering your main view.
-          {% elif query %}
-            Try adjusting your search terms or clearing your filters.
-          {% else %}
-            Get started by creating your very first note!
-          {% endif %}
-        </p>
-
-        {% if current_status != 'trash' and not query %}
-        <button class="btn btn-primary btn-sm rounded-pill px-3"
-                hx-get="/notes/create-modal"
-                hx-target="#modal-container"
-                hx-swap="innerHTML">
-          <i class="bi bi-plus-lg me-1"></i> Create Note
-        </button>
-        {% endif %}
-      </div>
-    </div>
+    {% if current_filter == 'trash' %}
+      {% include "partials/trash_card.html" %}
+    {% else %}
+      {% include "partials/note_card.html" %}
+    {% endif %}
   {% endfor %}
 </div>
+{% else %}
+<!-- Empty State -->
+<div class="card border-dashed py-5 text-center my-4 shadow-sm"
+  style="border: 2px dashed var(--card-border); background-color: var(--card-bg);" id="notes-grid">
+  <div class="card-body py-5">
+    <div class="display-5 text-muted mb-3">
+      {% if search_query %}
+        <i class="bi bi-search text-muted opacity-50"></i>
+      {% elif current_filter == 'favorites' %}
+        <span class="text-warning">★</span>
+      {% elif current_filter == 'pinned' %}
+        <span>📌</span>
+      {% elif current_filter == 'archive' %}
+        <span>📦</span>
+      {% elif current_filter == 'trash' %}
+        <i class="bi bi-trash3 text-muted"></i>
+      {% else %}
+        <i class="bi bi-journal-plus text-primary opacity-75"></i>
+      {% endif %}
+    </div>
+    <h2 class="h4 fw-bold mb-2">
+      {% if search_query %}
+        No notes matching "{{ search_query }}"
+      {% elif current_filter == 'favorites' %}
+        No Favorite Notes
+      {% elif current_filter == 'pinned' %}
+        No Pinned Notes
+      {% elif current_filter == 'archive' %}
+        Archive is Empty
+      {% elif current_filter == 'trash' %}
+        Trash is Empty
+      {% elif selected_category %}
+        No notes in category "{{ selected_category.name }}"
+      {% elif selected_tag %}
+        No notes tagged "#{{ selected_tag.name }}"
+      {% else %}
+        No notes yet
+      {% endif %}
+    </h2>
+    <p class="text-muted small mb-4" style="max-width: 420px; margin: 0 auto;">
+      {% if search_query %}
+        We couldn't find any notes matching your search. Try different keywords or clear your search.
+      {% elif current_filter == 'favorites' %}
+        Click the "☆ Favorite" button on any note card to add it to your favorites.
+      {% elif current_filter == 'pinned' %}
+        Click the "📌 Pin" button on any note card to keep it pinned at the top.
+      {% elif current_filter == 'archive' %}
+        Archived notes will appear here without cluttering your main view.
+      {% elif current_filter == 'trash' %}
+        Deleted notes will appear here before being permanently removed.
+      {% elif selected_category or selected_tag %}
+        Try clearing the filter or creating a new note with this category/tag.
+      {% else %}
+        You haven't created any notes yet. Click the button below to create your first note.
+      {% endif %}
+    </p>
+    <div class="d-flex align-items-center justify-content-center gap-2">
+      {% if search_query %}
+      <button type="button" class="btn btn-outline-secondary rounded-pill px-3"
+              onclick="const input=document.getElementById('global-search-input'); if(input){ input.value=''; htmx.trigger(input, 'search'); }">
+        <i class="bi bi-x-circle me-1"></i> Clear Search
+      </button>
+      {% elif selected_category or selected_tag or current_filter %}
+      <a href="/" class="btn btn-outline-secondary rounded-pill px-3">
+        {% if current_filter == 'trash' %}Return to Notes{% else %}Clear Filter{% endif %}
+      </a>
+      {% endif %}
+      {% if current_filter != 'trash' %}
+      <a href="/notes/new{% if current_category_id %}?category_id={{ current_category_id }}{% endif %}"
+        class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i> Create Note
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Dynamic Header Count Update via OOB swap -->
+{% if current_filter == 'trash' %}
+  <span id="trash-header-count" hx-swap-oob="innerHTML">{{ notes|length }}</span>
+{% else %}
+  <span id="notes-header-count" hx-swap-oob="innerHTML">{{ notes|length }}</span>
+{% endif %}

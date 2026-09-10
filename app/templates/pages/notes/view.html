@@ -11,7 +11,13 @@
       <i class="bi bi-arrow-left me-1"></i> Back to Notes
     </a>
     
-    <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center flex-wrap gap-2">
+      {% include "partials/note_favorite_action.html" %}
+      {% if not note.is_archived %}
+        {% include "partials/note_pin_action.html" %}
+      {% endif %}
+      {% with target_self=True %}{% include "partials/note_archive_action.html" %}{% endwith %}
+      
       <a href="/notes/{{ note.id }}/edit" class="btn btn-sm btn-outline-primary rounded-pill px-3 d-flex align-items-center">
         <i class="bi bi-pencil me-1"></i> Edit Note
       </a>

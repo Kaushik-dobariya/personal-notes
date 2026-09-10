@@ -1,0 +1,17 @@
+<div id="note-archive-action-{{ note.id }}" class="d-inline-block">
+  <button type="button"
+          class="btn btn-sm {% if note.is_archived %}btn-outline-success{% else %}btn-outline-secondary{% endif %} rounded-pill px-2 py-1 d-inline-flex align-items-center gap-1 archive-btn"
+          title="{{ 'Unarchive and restore to All Notes' if note.is_archived else 'Archive note' }}"
+          hx-post="/notes/{{ note.id }}/toggle-archive"
+          hx-target="{% if target_self %}#note-archive-action-{{ note.id }}{% else %}#note-card-col-{{ note.id }}{% endif %}"
+          hx-swap="outerHTML">
+    <span class="archive-icon">📦</span>
+    <span class="archive-label small">{{ 'Unarchive' if note.is_archived else 'Archive' }}</span>
+  </button>
+</div>
+{% if request.headers.get('HX-Request') == 'true' and note_counts is defined and note_counts %}
+<span id="sidebar-all-count" hx-swap-oob="innerHTML">{{ note_counts.all }}</span>
+<span id="sidebar-favorites-count" hx-swap-oob="innerHTML">{{ note_counts.favorites }}</span>
+<span id="sidebar-pinned-count" hx-swap-oob="innerHTML">{{ note_counts.pinned }}</span>
+<span id="sidebar-archive-count" hx-swap-oob="innerHTML">{{ note_counts.archived }}</span>
+{% endif %}

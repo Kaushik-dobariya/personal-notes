@@ -1,0 +1,14 @@
+<div id="note-favorite-action-{{ note.id }}" class="d-inline-block">
+  <button type="button"
+          class="btn btn-sm {% if note.is_favorite %}btn-warning text-dark border-warning{% else %}btn-outline-secondary{% endif %} rounded-pill px-2 py-1 d-inline-flex align-items-center gap-1 favorite-btn"
+          title="{{ 'Remove from Favorites' if note.is_favorite else 'Mark as Favorite' }}"
+          hx-post="/notes/{{ note.id }}/toggle-favorite"
+          hx-target="#note-favorite-action-{{ note.id }}"
+          hx-swap="outerHTML">
+    <span class="favorite-icon">{{ '★' if note.is_favorite else '☆' }}</span>
+    <span class="favorite-label small">Favorite</span>
+  </button>
+</div>
+{% if request.headers.get('HX-Request') == 'true' and note_counts is defined and note_counts %}
+<span id="sidebar-favorites-count" hx-swap-oob="innerHTML">{{ note_counts.favorites }}</span>
+{% endif %}
